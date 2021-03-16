@@ -28,7 +28,7 @@ const PlansScreen = ({navigation}) => {
   }, []);
 
   const goToPlanDetails = (planId) => {
-    navigation.navigate('Details', {planId});
+    navigation.navigate('PlanDetails', {planId});
   };
 
   return (

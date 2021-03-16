@@ -56,7 +56,9 @@ const DetailsScreen = ({route, navigation}) => {
 
               <Text style={styles.selectorTitle}>Dersler</Text>
               {plan.lessons.map((lesson) => (
-                <Text style={styles.selectorSubtext}>{lesson.name}</Text>
+                <Text key={lesson.lesson_id} style={styles.selectorSubtext}>
+                  {lesson.name}
+                </Text>
               ))}
             </View>
           </ScrollView>

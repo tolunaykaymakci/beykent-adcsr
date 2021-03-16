@@ -129,7 +129,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.sorusayacireactnative"
+        applicationId "com.clientreactnative"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "SoruSayaciReactNative.app"
-               BlueprintName = "SoruSayaciReactNative"
-               ReferencedContainer = "container:SoruSayaciReactNative.xcodeproj">
+               BuildableName = "ClientReactNative.app"
+               BlueprintName = "ClientReactNative"
+               ReferencedContainer = "container:ClientReactNative.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "SoruSayaciReactNativeTests.xctest"
-               BlueprintName = "SoruSayaciReactNativeTests"
-               ReferencedContainer = "container:SoruSayaciReactNative.xcodeproj">
+               BuildableName = "ClientReactNativeTests.xctest"
+               BlueprintName = "ClientReactNativeTests"
+               ReferencedContainer = "container:ClientReactNative.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "SoruSayaciReactNative.app"
-            BlueprintName = "SoruSayaciReactNative"
-            ReferencedContainer = "container:SoruSayaciReactNative.xcodeproj">
+            BuildableName = "ClientReactNative.app"
+            BlueprintName = "ClientReactNative"
+            ReferencedContainer = "container:ClientReactNative.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "SoruSayaciReactNative.app"
-            BlueprintName = "SoruSayaciReactNative"
-            ReferencedContainer = "container:SoruSayaciReactNative.xcodeproj">
+            BuildableName = "ClientReactNative.app"
+            BlueprintName = "ClientReactNative"
+            ReferencedContainer = "container:ClientReactNative.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

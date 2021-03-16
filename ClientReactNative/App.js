@@ -2,6 +2,7 @@
 import 'react-native-gesture-handler';
 
 import * as React from 'react';
+import {StatusBar} from 'react-native';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -9,17 +10,29 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import HomeScreen from './pages/HomeScreen';
-import DetailsScreen from './pages/DetailsScreen';
-import ProfileScreen from './pages/ProfileScreen';
-import SettingsScreen from './pages/SettingsScreen';
-import PlansScreen from './pages/PlansScreen';
-import AsqmScreen from './pages/AsqmScreen';
-import AsqmQuestions from './pages/AsqmQuestionsScreen';
-import AsqmThreadScreen from './pages/AsqmThreadScreen';
-import CommScreen from './pages/CommScreen';
+import HomeScreen from './screens/HomeScreen';
+import PlansScreen from './screens/PlansScreen';
 
-import Service from './Service';
+import PlanDetailsScreen from './screens/PlanDetailsScreen';
+
+import ProfileScreen from './screens/ProfileScreen';
+import AsqmScreen from './screens/AsqmScreen';
+import AsqmQuestions from './screens/AsqmQuestionsScreen';
+import AsqmThreadScreen from './screens/AsqmThreadScreen';
+import CommScreen from './screens/CommScreen';
+
+// New Screens!
+
+import QuestionsReportScreen from './screens/QuestionsReportScreen';
+import StudiesReportScreen from './screens/StudiesReportScreen';
+
+import RecordsScreen from './screens/RecordsScreen';
+import StatisticsScreen from './screens/StatisticsScreen';
+import TimersScreen from './screens/TimersScreen';
+import GuideScreen from './screens/GuideScreen';
+import SettingsScreen from './screens/SettingsScreen';
+
+import {GlobalStyles, GlobalColors} from './src/GlobalStyles';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,7 +43,9 @@ const getTabBarVisibility = (route) => {
     ? route.state.routes[route.state.index].name
     : '';
 
-  if (routeName === 'Plans') {
+  const hideTabsScreens = ['Plans', 'PlanDetails'];
+
+  if (hideTabsScreens.indexOf(routeName) > -1) {
     return false;
   }
 
@@ -43,12 +58,12 @@ function HomeStack() {
       initialRouteName="Home"
       screenOptions={{
         headerStyle: {
-          backgroundColor: 'transparent',
+          backgroundColor: GlobalColors.windowBackground,
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 0,
         },
-        headerTintColor: '#000',
+        headerTintColor: GlobalColors.titleText,
         headerTitleStyle: {},
       }}>
       <Stack.Screen
@@ -59,14 +74,45 @@ function HomeStack() {
         }}
       />
       <Stack.Screen
-        name="Details"
-        component={DetailsScreen}
-        options={{title: 'Details Page'}}
+        name="PlanDetails"
+        component={PlanDetailsScreen}
+        options={{title: 'Planım'}}
       />
       <Stack.Screen
         name="Plans"
         component={PlansScreen}
         options={{title: 'Çalışma Planlarım'}}
+      />
+      <Stack.Screen
+        name="QuestionsReport"
+        component={QuestionsReportScreen}
+        options={{title: 'Soru Çözümlerim'}}
+      />
+      <Stack.Screen
+        name="StudiesReport"
+        component={StudiesReportScreen}
+        options={{title: 'Çalışmalarım'}}
+      />
+
+      <Stack.Screen
+        name="Records"
+        component={RecordsScreen}
+        options={{title: 'Kayıtlarım'}}
+      />
+      <Stack.Screen
+        name="Statistics"
+        component={StatisticsScreen}
+        options={{title: 'İstatistiklerim'}}
+      />
+      <Stack.Screen
+        name="Timers"
+        component={TimersScreen}
+        options={{title: 'Sayaçlarım'}}
+      />
+      <Stack.Screen
+        name="Guide"
+        component={GuideScreen}
+        options={{title: 'Puanlar & Tercih'}}
       />
     </Stack.Navigator>
   );
@@ -143,8 +189,8 @@ function SettingsStack() {
         options={{title: 'Setting Page'}}
       />
       <Stack.Screen
-        name="Details"
-        component={DetailsScreen}
+        name="PlanDetails"
+        component={PlanDetailsScreen}
         options={{title: 'Details Page'}}
       />
       <Stack.Screen
@@ -159,10 +205,18 @@ function SettingsStack() {
 function App() {
   return (
     <NavigationContainer>
+      <StatusBar
+        backgroundColor={GlobalColors.windowBackground}
+        barStyle={GlobalColors.statusBarFront}
+      />
       <Tab.Navigator
         initialRouteName="Feed"
         tabBarOptions={{
           activeTintColor: '#00f',
+          inactiveTintColor: '#f00',
+          style: {
+            backgroundColor: GlobalColors.primaryCard,
+          },
         }}>
         <Tab.Screen
           name="HomeStack"
@@ -222,4 +276,5 @@ function App() {
     </NavigationContainer>
   );
 }
+
 export default App;
