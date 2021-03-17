@@ -2,7 +2,7 @@ import React from 'react';
 
 import {StyleSheet} from 'react-native';
 
-const currentAppTheme = 'light';
+const currentAppTheme = 'dark';
 
 export const GlobalColors = {
   statusBarFront: currentAppTheme != 'dark' ? 'dark-content' : 'light-content',
