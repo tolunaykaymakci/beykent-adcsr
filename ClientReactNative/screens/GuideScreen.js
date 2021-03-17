@@ -4,7 +4,7 @@ import {Text, SafeAreaView} from 'react-native';
 function App() {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#ddd'}}>
-      <Text>Soru Çözümlerim buraya gelecek</Text>
+      <Text>Rehber ve Puanlar buraya gelecek</Text>
     </SafeAreaView>
   );
 }
