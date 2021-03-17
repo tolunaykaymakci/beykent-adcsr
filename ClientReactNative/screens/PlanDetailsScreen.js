@@ -1,32 +1,20 @@
 ﻿import React, {useState, useEffect} from 'react';
 import {View, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 
-import Service, {AuthorizedRequest} from '../Service';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {authorizedRequest} from '../Service';
 
 const DetailsScreen = ({route, navigation}) => {
-  const [plan, setPlan] = useState();
   const {planId} = route.params;
+  const [plan, setPlan] = useState();
 
   useEffect(() => {
-    var x = JSON.stringify(AuthorizedRequest({plan_id: planId}));
-
-    let data = {
-      method: 'POST',
-      credentials: 'same-origin',
-      mode: 'same-origin',
-      body: x,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    };
-
-    fetch('http://192.168.1.104:5000/ss/sdb/plan', data)
+    authorizedRequest('http://192.168.1.104:5000/ss/sdb/plan', {
+      plan_id: planId,
+    })
       .then((response) => response.json())
       .then((json) => {
-        console.log(json);
         setPlan(json.plan);
-        //setData(json.lessons);
       })
       .catch((error) => console.error(error))
       .finally(() => {});
@@ -34,36 +22,54 @@ const DetailsScreen = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         {plan == null ? (
-          <Text>Plan falan yok!</Text>
+          <Text>Yükleniyor...</Text>
         ) : (
-          <ScrollView>
-            <View style={{flex: 1, padding: 16}}>
-              <Text>Plan Detayları</Text>
+          <View>
+            <Text style={{padding: 12, fontWeight: 'bold', fontSize: 13}}>
+              PLAN DETAYLARI
+            </Text>
 
-              <Text style={styles.selectorTitle}>Plan İsmi</Text>
-              <Text style={styles.selectorSubtext}>{plan.name}</Text>
-
-              <Text style={styles.selectorTitle}>Çalışılan Sınav</Text>
-              <Text style={styles.selectorSubtext}>{plan.exam_title}</Text>
-
-              <Text style={styles.selectorTitle}>Yaratılma Tarihi</Text>
-              <Text style={styles.selectorSubtext}>{plan.created}</Text>
-
-              <Text style={styles.selectorTitle}>Ders Programı</Text>
-              <Text style={styles.selectorSubtext}>{plan.program_type}</Text>
-
-              <Text style={styles.selectorTitle}>Dersler</Text>
-              {plan.lessons.map((lesson) => (
-                <Text key={lesson.lesson_id} style={styles.selectorSubtext}>
-                  {lesson.name}
-                </Text>
-              ))}
+            <View style={styles.cardLayout}>
+              <Text>Çalıştığınız Sınav</Text>
+              <Text>
+                {plan.exam_title} ({plan.exam_acr})
+              </Text>
             </View>
-          </ScrollView>
+            <View style={styles.cardLayout}>
+              <Text>Plan İsmi</Text>
+              <Text>{plan.name}</Text>
+              <MaterialCommunityIcons
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  marginRight: 12,
+                  marginTop: 21,
+                }}
+                onPress={() => {
+                  alert('plan ismini değiştiriyorum');
+                }}
+                name="border-color"
+                color={'rgb(64,64,64)'}
+                size={24}
+              />
+            </View>
+            <View style={styles.cardLayout}>
+              <Text>Oluşturulma Tarihi</Text>
+              <Text>{plan.created}</Text>
+            </View>
+
+            <Text style={{padding: 12, fontWeight: 'bold', fontSize: 13}}>
+              DERSLERİM
+            </Text>
+
+            {plan.lessons.map((lesson, index) => (
+              <Text style={styles.cardLayout}>{lesson.name}</Text>
+            ))}
+          </View>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -77,6 +83,10 @@ const styles = StyleSheet.create({
   selectorSubtext: {
     fontSize: 14.75,
     marginBottom: 4,
+  },
+  cardLayout: {
+    backgroundColor: 'white',
+    padding: 12,
   },
 });
 

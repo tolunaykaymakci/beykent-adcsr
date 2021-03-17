@@ -12,7 +12,7 @@ export const AuthorizedRequest = (json1) => {
 };
 
 export const AuthorizedRequest2 = (url, params) => {
-  let data = {
+  /*   let data = {
     method: 'POST',
     credentials: 'same-origin',
     mode: 'same-origin',
@@ -22,7 +22,7 @@ export const AuthorizedRequest2 = (url, params) => {
       'Content-Type': 'application/json',
     },
   };
-
+ */
   return fetch(url, params);
 };
 
@@ -32,6 +32,21 @@ export function authorizedRequest(url, params) {
     credentials: 'same-origin',
     mode: 'same-origin',
     body: JSON.stringify({...params, ...AuthorizedRequestContract}),
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+  };
+
+  return fetch(url, data);
+}
+
+export function casualRequest(url, params) {
+  let data = {
+    method: 'POST',
+    credentials: 'same-origin',
+    mode: 'same-origin',
+    body: JSON.stringify(params),
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',

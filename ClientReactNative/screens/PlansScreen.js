@@ -3,10 +3,7 @@
 import React, {useState, useEffect} from 'react';
 import {
   TouchableOpacity,
-  TouchableHighlight,
-  TouchableNativeFeedback,
   StyleSheet,
-  Button,
   View,
   Text,
   SafeAreaView,
