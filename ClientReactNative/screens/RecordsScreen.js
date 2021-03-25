@@ -71,7 +71,7 @@ function App({route, navigation}) {
   };
 
   const requestQuestionItems = () => {
-    authorizedRequest('http://192.168.1.104:5000/api/records/questions', {
+    authorizedRequest('api/records/questions', {
       mode: 'continuous',
       plan: planId,
       last: Number.MAX_SAFE_INTEGER,

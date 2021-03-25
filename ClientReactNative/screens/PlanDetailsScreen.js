@@ -9,7 +9,7 @@ const DetailsScreen = ({route, navigation}) => {
   const [plan, setPlan] = useState();
 
   useEffect(() => {
-    authorizedRequest('http://192.168.1.104:5000/ss/sdb/plan', {
+    authorizedRequest('ss/sdb/plan', {
       plan_id: planId,
     })
       .then((response) => response.json())
