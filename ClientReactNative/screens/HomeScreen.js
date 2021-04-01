@@ -109,7 +109,7 @@ const HomeSummaryScreen = ({nav}) => {
   const [timersData, setTimersData] = useState();
 
   useLayoutEffect(() => {
-    authorizedRequest('http://192.168.1.104:5000/api/app/home/', {})
+    authorizedRequest('api/app/home/', {})
       .then((response) => response.json())
       .then((json) => {
         console.log(json);
@@ -127,7 +127,7 @@ const HomeSummaryScreen = ({nav}) => {
   }, []);
 
   const requestSubModules = () => {
-    authorizedRequest('http://192.168.1.104:5000/api/app/home/ques', {})
+    authorizedRequest('api/app/home/ques', {})
       .then((response) => response.json())
       .then((json) => {
         setQReportData(json);
@@ -136,7 +136,7 @@ const HomeSummaryScreen = ({nav}) => {
       .catch((error) => console.error(error))
       .finally(() => {});
 
-    authorizedRequest('http://192.168.1.104:5000/api/app/home/stud', {})
+    authorizedRequest('api/app/home/stud', {})
       .then((response) => response.json())
       .then((json) => {
         setSReportData(json);
@@ -145,7 +145,7 @@ const HomeSummaryScreen = ({nav}) => {
       .catch((error) => console.error(error))
       .finally(() => {});
 
-    authorizedRequest('http://192.168.1.104:5000/api/app/home/recs', {})
+    authorizedRequest('api/app/home/recs', {})
       .then((response) => response.json())
       .then((json) => {
         setRecordsData(json);
@@ -154,7 +154,7 @@ const HomeSummaryScreen = ({nav}) => {
       .catch((error) => console.error(error))
       .finally(() => {});
 
-    authorizedRequest('http://192.168.1.104:5000/api/app/home/timr', {})
+    authorizedRequest('api/app/home/timr', {})
       .then((response) => response.json())
       .then((json) => {
         setTimersData(json);

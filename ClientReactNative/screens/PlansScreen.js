@@ -9,13 +9,13 @@ import {
   SafeAreaView,
 } from 'react-native';
 
-import {authorizedRequest} from '../Service';
+import {getRequest, authorizedRequest} from '../Service';
 
 const PlansScreen = ({navigation}) => {
   const [plans, setPlans] = useState();
 
   useEffect(() => {
-    authorizedRequest('http://192.168.1.104:5000/ss/sdb/plan/all', {})
+    authorizedRequest('ss/sdb/plan/all', {})
       .then((response) => response.json())
       .then((json) => {
         setPlans(json.plans);
