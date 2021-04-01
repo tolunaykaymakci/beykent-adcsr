@@ -16,6 +16,7 @@ import {
 import * as Progress from 'react-native-progress';
 import {GlobalStyles, GlobalColors} from '../src/GlobalStyles';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {WebView} from 'react-native-webview';
 
 import {authorizedRequest} from '../Service';
 
@@ -31,7 +32,7 @@ const HomeScreen = ({navigation}) => {
     navigation.setOptions({
       headerRight: () => (
         <>
-          <Button onPress={() => alert('poncik!')} title="Soru Ekle" />
+          <Button onPress={() => alert('test!')} title="Soru Ekle" />
         </>
       ),
     });
@@ -39,58 +40,7 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      <View style={{...styles.tabsContainer, display: 'none'}}>
-        <TouchableHighlight
-          activeOpacity={0.6}
-          underlayColor="#edf3ff"
-          onPress={() => setHomeMode(0)}
-          style={homeMode == 0 ? styles.tabButtonSelected : styles.tabButton}>
-          <Text
-            style={
-              homeMode == 0
-                ? styles.tabButtonTextSelected
-                : styles.tabButtonText
-            }>
-            BUGÜNÜN ÖZETİ
-          </Text>
-        </TouchableHighlight>
-
-        <TouchableHighlight
-          activeOpacity={0.6}
-          underlayColor="#edf3ff"
-          onPress={() => setHomeMode(1)}
-          style={homeMode == 1 ? styles.tabButtonSelected : styles.tabButton}>
-          <Text
-            style={
-              homeMode == 1
-                ? styles.tabButtonTextSelected
-                : styles.tabButtonText
-            }>
-            SAYAÇLARIM
-          </Text>
-        </TouchableHighlight>
-
-        <TouchableHighlight
-          activeOpacity={0.6}
-          underlayColor="#edf3ff"
-          onPress={() => setHomeMode(2)}
-          style={homeMode == 2 ? styles.tabButtonSelected : styles.tabButton}>
-          <Text
-            style={
-              homeMode == 2
-                ? styles.tabButtonTextSelected
-                : styles.tabButtonText
-            }>
-            ARKADAŞLARIM
-          </Text>
-        </TouchableHighlight>
-      </View>
-
-      {homeMode == 0 ? (
-        <HomeSummaryScreen nav={navigation} />
-      ) : (
-        <Text>Not Implemented Yet</Text>
-      )}
+      <HomeSummaryScreen nav={navigation} />
     </SafeAreaView>
   );
 };
@@ -112,7 +62,6 @@ const HomeSummaryScreen = ({nav}) => {
     authorizedRequest('api/app/home/', {})
       .then((response) => response.json())
       .then((json) => {
-        console.log(json);
         setMainReport(json);
         setLoadingMain(false);
 
@@ -183,16 +132,100 @@ const HomeSummaryScreen = ({nav}) => {
         </View>
       ) : (
         <ScrollView style={{flex: 1}}>
+          {/* Navigation menu */}
+          <View style={{flexDirection: 'row', marginTop: 12}}>
+            <TouchableOpacity
+              style={styles.navMenuButtonLeft}
+              onPress={() => nav.navigate('Plans')}>
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center'}}
+                name="clipboard-text"
+                color={'rgb(58,79,101)'}
+                size={22}
+              />
+
+              <Text style={styles.navMenuLabel}>Çalışma Planlarım</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.navMenuButtonRight}
+              onPress={() => nav.navigate('Friends')}>
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center'}}
+                name="account-group"
+                color={'rgb(58,79,101)'}
+                size={22}
+              />
+
+              <Text style={styles.navMenuLabel}>Arkadaşlarım</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              style={styles.navMenuButtonLeft}
+              onPress={() => nav.navigate('Guide')}>
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center'}}
+                name="segment"
+                color={'rgb(58,79,101)'}
+                size={22}
+              />
+
+              <Text style={styles.navMenuLabel}>Puanlar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.navMenuButtonRight}
+              onPress={() => nav.navigate('Timers')}>
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center'}}
+                name="timer"
+                color={'rgb(58,79,101)'}
+                size={22}
+              />
+
+              <Text style={styles.navMenuLabel}>Sayaçlarım</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              style={styles.navMenuButtonLeft}
+              onPress={() =>
+                nav.navigate('SettingsStack', {screen: 'Settings'})
+              }>
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center'}}
+                name="cog"
+                color={'rgb(58,79,101)'}
+                size={22}
+              />
+
+              <Text style={styles.navMenuLabel}>Ayarlarım</Text>
+            </TouchableOpacity>
+
+            <View
+              style={{
+                ...styles.navMenuButtonRight,
+                backgroundColor: 'transparent',
+              }}
+              onPress={() =>
+                nav.navigate('Records', {planId: mainReport.plan.plan_id})
+              }></View>
+          </View>
+
+          {/* User Study Plans Strip */}
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <View style={{flexDirection: 'row', marginStart: 12}}>
               <Text
                 style={{
                   ...GlobalStyles.titleText,
-                  paddingTop: 6,
-                  paddingBottom: 10,
+                  paddingTop: 12,
+                  paddingBottom: 6,
                   marginStart: 6,
                   marginEnd: 6,
-                  fontSize: 19,
+                  fontSize: 15.75,
                   fontWeight: 'bold',
                 }}>
                 {mainReport.plan.name}
@@ -218,298 +251,242 @@ const HomeSummaryScreen = ({nav}) => {
               )}
             </View>
           </ScrollView>
+
+          {/* Questions Report Card */}
           <TouchableOpacity
-            style={{...GlobalStyles.primaryCard, ...GlobalStyles.homeCard}}
-            onPress={() => nav.navigate('QuestionsReport')}>
+            style={{
+              ...GlobalStyles.primaryCard,
+              ...GlobalStyles.homeCard,
+              height: 'auto',
+            }}
+            onPress={() =>
+              nav.navigate('QuestionsReport', {planId: mainReport.plan.plan_id})
+            }>
             <Text style={GlobalStyles.cardTitleText}>Soru Çözümlerim</Text>
-            <Text style={GlobalStyles.subText}>Bugün</Text>
-            <MaterialCommunityIcons
-              style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-              name="border-color"
-              color={'rgb(171,180,190)'}
-              size={36}
-            />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 12,
+                marginEnd: 5,
+                position: 'absolute',
+                right: 0,
+              }}>
+              <Text style={{alignSelf: 'center', fontSize: 13}}>DETAYLAR</Text>
+
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center'}}
+                name="chevron-right"
+                color={'rgb(58,79,101)'}
+                size={24}
+              />
+            </View>
 
             {loadingQReports ? (
-              <Progress.Circle
+              <View
                 style={{
+                  ...GlobalStyles.primaryCard,
+                  width: 48,
+                  height: 48,
                   position: 'absolute',
-                  margin: 12,
-                  bottom: 0,
-                }}
-                thickness={40}
-                size={24}
-                indeterminate={true}
-              />
-            ) : (
+                  marginTop: 120,
+                  alignSelf: 'center',
+                }}>
+                <Progress.Circle
+                  thickness={40}
+                  size={24}
+                  indeterminate={true}
+                />
+              </View>
+            ) : null}
+
+            <View
+              style={{
+                marginTop: 12,
+                opacity: loadingQReports ? 0 : 1,
+                width: '100%',
+              }}>
               <View
                 style={{
                   flexDirection: 'row',
-                  position: 'absolute',
-                  margin: 12,
-                  bottom: 0,
+                  alignSelf: 'center',
+                  marginTop: 12,
                 }}>
-                <Text style={{fontSize: 25, marginEnd: 3}}>
-                  {qReportData.qts}
+                <Text style={{fontSize: 16, color: GlobalColors.titleText}}>
+                  Bugün
                 </Text>
                 <Text
-                  style={{fontSize: 16, alignSelf: 'flex-end', marginEnd: 3}}>
-                  soru
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    marginStart: 4,
+                    marginEnd: 4,
+                    color: GlobalColors.titleText,
+                  }}>
+                  {qReportData != null ? qReportData.qts : null}
                 </Text>
-                <Text style={{fontSize: 25, marginEnd: 3}}>
-                  {qReportData.qtc}
+                <Text style={{fontSize: 16, color: GlobalColors.titleText}}>
+                  soru çözüldü
                 </Text>
-                <Text style={{fontSize: 16, alignSelf: 'flex-end'}}>test</Text>
               </View>
-            )}
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignSelf: 'center',
+                  marginTop: 5,
+                }}>
+                <MaterialCommunityIcons
+                  style={{alignSelf: 'center'}}
+                  name="timer"
+                  color={'rgb(58,79,101)'}
+                  size={13}
+                />
+                <Text>{qReportData != null ? qReportData.qlc : null} ders</Text>
+                <MaterialCommunityIcons
+                  style={{alignSelf: 'center', marginStart: 12}}
+                  name="timer"
+                  color={'rgb(58,79,101)'}
+                  size={13}
+                />
+                <Text>{qReportData != null ? qReportData.qsc : null} konu</Text>
+                <MaterialCommunityIcons
+                  style={{alignSelf: 'center', marginStart: 12}}
+                  name="timer"
+                  color={'rgb(58,79,101)'}
+                  size={13}
+                />
+                <Text>{qReportData != null ? qReportData.qtc : null} test</Text>
+              </View>
+
+              {/* Questions Graph */}
+              <View
+                style={{
+                  height: 158,
+                  width: '100%',
+                  marginTop: 8,
+                }}>
+                <WebView
+                  style={{
+                    flex: 1,
+                    height: '100%',
+                    marginStart: 12,
+                    marginEnd: 12,
+                  }}
+                  source={{uri: 'http://192.168.1.104:5000/grpfr'}}
+                  bounces={false}
+                  showsHorizontalScrollIndicator={false}
+                  scrollEnabled={false}
+                />
+              </View>
+
+              {/* Questions Study Program */}
+              <View
+                style={{
+                  height: 40,
+                  width: '100%',
+                  display: 'none',
+                  marginTop: 8,
+                  backgroundColor: 'blue',
+                }}></View>
+            </View>
           </TouchableOpacity>
 
-          <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginEnd: 6,
-              }}
-              onPress={() => nav.navigate('StudiesReport')}>
-              <Text style={GlobalStyles.cardTitleText}>Çalışmalarım</Text>
-              <Text style={GlobalStyles.subText}>Bugün</Text>
-              <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="notebook"
-                color={'rgb(171,180,190)'}
-                size={36}
-              />
-
-              {loadingSReports ? (
-                <Progress.Circle
-                  style={{
-                    position: 'absolute',
-                    margin: 12,
-                    bottom: 0,
-                  }}
-                  thickness={40}
-                  size={24}
-                  indeterminate={true}
-                />
-              ) : (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    position: 'absolute',
-                    margin: 12,
-                    bottom: 0,
-                  }}>
-                  <Text
-                    style={{
-                      ...GlobalStyles.titleText,
-                      fontSize: 25,
-                      marginEnd: 3,
-                    }}>
-                    {sReportData.sts}
-                  </Text>
-                  <Text
-                    style={{
-                      ...GlobalStyles.subText,
-                      fontSize: 16,
-                      alignSelf: 'flex-end',
-                      marginEnd: 3,
-                    }}>
-                    dakika
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginStart: 6,
-              }}
-              onPress={() =>
-                nav.navigate('Records', {planId: mainReport.plan.plan_id})
-              }>
-              <Text style={GlobalStyles.cardTitleText}>Kayıtlarım</Text>
-              <Text style={GlobalStyles.subText}>Tüm Kayıtlarım</Text>
-              <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="file-document"
-                color={'rgb(171,180,190)'}
-                size={36}
-              />
-
-              {loadingRecords ? (
-                <Progress.Circle
-                  style={{
-                    position: 'absolute',
-                    margin: 12,
-                    bottom: 0,
-                  }}
-                  thickness={40}
-                  size={24}
-                  indeterminate={true}
-                />
-              ) : (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    position: 'absolute',
-                    margin: 12,
-                    bottom: 0,
-                  }}>
-                  <Text
-                    style={{
-                      ...GlobalStyles.titleText,
-                      fontSize: 25,
-                      marginEnd: 3,
-                    }}>
-                    {recordsData.count_q + recordsData.count_s}
-                  </Text>
-                  <Text
-                    style={{
-                      ...GlobalStyles.subText,
-                      fontSize: 16,
-                      alignSelf: 'flex-end',
-                      marginEnd: 3,
-                    }}>
-                    kayıt
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginEnd: 6,
-              }}
-              onPress={() => nav.navigate('Statistics')}>
-              <Text style={GlobalStyles.cardTitleText}>İstatistiklerim</Text>
-              <Text style={GlobalStyles.subText}>
-                Genel Durumum, Ders İstatistiklerim
-              </Text>
-              <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="graph"
-                color={'rgb(171,180,190)'}
-                size={36}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginStart: 6,
-              }}
-              onPress={() =>
-                nav.navigate('PlanDetails', {planId: mainReport.plan.plan_id})
-              }>
-              <Text style={GlobalStyles.cardTitleText}>Planım</Text>
-              <Text style={GlobalStyles.subText}>
-                Dersler, konular, ders programları
-              </Text>
-              <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="clipboard-text"
-                color={'rgb(171,180,190)'}
-                size={36}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <Text
+          {/* Studies Report Card */}
+          <TouchableOpacity
             style={{
-              fontSize: 19,
-              fontWeight: 'bold',
-              marginStart: 16,
-              marginTop: 12,
-              marginBottom: 6,
-              color: 'rgb(105, 105, 107)',
-            }}>
-            NAVİGASYON
-          </Text>
+              ...GlobalStyles.primaryCard,
+              ...GlobalStyles.homeCard,
+              height: 'auto',
+            }}
+            onPress={() =>
+              nav.navigate('StudiesReport', {planId: mainReport.plan.plan_id})
+            }>
+            <Text style={GlobalStyles.cardTitleText}>Konu Çalışmalarım</Text>
 
-          <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
+            <View
               style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginEnd: 6,
-              }}
-              onPress={() => nav.navigate('Plans')}>
-              <Text style={GlobalStyles.cardTitleText}>Çalışma Planlarım</Text>
-              <Text style={GlobalStyles.subText}>Tüm Planlarım</Text>
+                flexDirection: 'row',
+                marginTop: 7,
+                marginEnd: 5,
+                position: 'absolute',
+                right: 0,
+              }}>
+              <Text style={{alignSelf: 'center', fontSize: 13}}>DETAYLAR</Text>
+
               <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="clipboard-text"
-                color={'rgb(171,180,190)'}
-                size={36}
+                style={{alignSelf: 'center'}}
+                name="chevron-right"
+                color={'rgb(58,79,101)'}
+                size={24}
               />
-            </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
+            <View
               style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginStart: 6,
-              }}
-              onPress={() => nav.navigate('Timers')}>
-              <Text style={GlobalStyles.cardTitleText}>Sayaçlarım</Text>
-              <Text style={GlobalStyles.subText}>Tüm Sayaçlarım</Text>
-              <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="timer"
-                color={'rgb(171,180,190)'}
-                size={36}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View style={{flexDirection: 'row', marginBottom: 12}}>
-            <TouchableOpacity
-              style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginEnd: 6,
-              }}
-              onPress={() => nav.navigate('Guide')}>
-              <Text style={GlobalStyles.cardTitleText}>Puanlar & Tercih</Text>
-              <Text style={GlobalStyles.subText}>
-                Puan hesapla veya bölümlere bak
+                flexDirection: 'row',
+                alignSelf: 'center',
+                marginTop: 12,
+              }}>
+              <Text style={{fontSize: 16, color: GlobalColors.titleText}}>
+                Bugün
               </Text>
-              <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="segment"
-                color={'rgb(171,180,190)'}
-                size={36}
-              />
-            </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginStart: 4,
+                  marginEnd: 4,
+                  color: GlobalColors.titleText,
+                }}>
+                {sReportData != null ? sReportData.sts : null}
+              </Text>
+              <Text style={{fontSize: 16, color: GlobalColors.titleText}}>
+                dakika çalışıldı
+              </Text>
+            </View>
 
-            <TouchableOpacity
+            <View
+              style={{flexDirection: 'row', alignSelf: 'center', marginTop: 5}}>
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center'}}
+                name="timer"
+                color={'rgb(58,79,101)'}
+                size={13}
+              />
+              <Text> {sReportData != null ? sReportData.slc : null} ders</Text>
+              <MaterialCommunityIcons
+                style={{alignSelf: 'center', marginStart: 12}}
+                name="timer"
+                color={'rgb(58,79,101)'}
+                size={13}
+              />
+              <Text> {sReportData != null ? sReportData.ssc : null} konu</Text>
+            </View>
+
+            {/* Studies Report Graph */}
+            <View
               style={{
-                ...GlobalStyles.primaryCard,
-                ...GlobalStyles.homeCard,
-                marginStart: 6,
-              }}
-              onPress={() =>
-                nav.navigate('SettingsStack', {screen: 'Settings'})
-              }>
-              <Text style={GlobalStyles.cardTitleText}>Ayarlar</Text>
-              <Text style={GlobalStyles.subText}>Uygulama Ayarları</Text>
-              <MaterialCommunityIcons
-                style={{position: 'absolute', margin: 12, right: 0, bottom: 0}}
-                name="cog"
-                color={'rgb(171,180,190)'}
-                size={36}
+                height: 158,
+                width: '100%',
+                marginTop: 8,
+              }}>
+              <WebView
+                style={{
+                  flex: 1,
+                  height: '100%',
+                  marginStart: 12,
+                  marginEnd: 12,
+                }}
+                source={{uri: 'http://192.168.1.104:5000/grpfr'}}
+                bounces={false}
+                showsHorizontalScrollIndicator={false}
+                scrollEnabled={false}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
+          {/* User Timers */}
           {loadingTimers ? (
             <Progress.Circle
               style={{
@@ -624,5 +601,28 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#5670a3',
   },
+  /* New */
+  navMenuButtonLeft: {
+    ...GlobalStyles.primaryCard,
+    ...GlobalStyles.homeCard,
+    flexDirection: 'row',
+    height: 50,
+    marginTop: 0,
+    marginEnd: 3,
+  },
+  navMenuButtonRight: {
+    ...GlobalStyles.primaryCard,
+    ...GlobalStyles.homeCard,
+    flexDirection: 'row',
+    marginTop: 0,
+    height: 50,
+    marginStart: 3,
+  },
+  navMenuLabel: {
+    alignSelf: 'center',
+    marginStart: 5,
+    color: GlobalColors.titleText,
+  },
 });
+
 export default HomeScreen;

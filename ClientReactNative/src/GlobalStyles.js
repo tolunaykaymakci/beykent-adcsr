@@ -9,7 +9,16 @@ export const GlobalColors = {
   windowBackground: currentAppTheme != 'dark' ? '#F2F2F5' : '#181818',
   titleText: currentAppTheme != 'dark' ? '#282828' : 'rgba(255,255,255,.9)',
   subText: currentAppTheme != 'dark' ? '#4C4C4C' : 'rgba(255,255,255,.7)',
-  primaryCard: currentAppTheme != 'dark' ? '#FFF' : '#252525',
+
+  primaryCard: currentAppTheme != 'dark' ? '#FFFFFF' : '#222222',
+  secondaryCard: currentAppTheme != 'dark' ? '#F9F9F9' : '#181818',
+  attentionCard: currentAppTheme != 'dark' ? '#E8E8E8' : '#373737',
+  headerSecondary: currentAppTheme != 'dark' ? '#FFFFFF' : '#2A2A2A',
+
+  seperator:
+    currentAppTheme != 'dark' ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.15)',
+
+  headerBackground: currentAppTheme != 'dark' ? '#FFF' : '#000',
 };
 
 export const GlobalStyles = StyleSheet.create({
@@ -19,6 +28,7 @@ export const GlobalStyles = StyleSheet.create({
     marginStart: 12,
     marginEnd: 12,
     borderRadius: 9,
+    overflow: 'hidden',
     padding: 12,
     shadowColor: '#000',
     shadowOffset: {

@@ -26,9 +26,12 @@ import CommScreen from './screens/CommScreen';
 import QuestionsReportScreen from './screens/QuestionsReportScreen';
 import StudiesReportScreen from './screens/StudiesReportScreen';
 
+import ManQuestionsScreen from './screens/ManQuestionsScreen';
+
 import RecordsScreen from './screens/RecordsScreen';
 import StatisticsScreen from './screens/StatisticsScreen';
 import TimersScreen from './screens/TimersScreen';
+import AddTimerScreen from './screens/AddTimerScreen';
 import GuideScreen from './screens/GuideScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
@@ -70,7 +73,7 @@ function HomeStack() {
         name="Home"
         component={HomeScreen}
         options={{
-          title: 'Soru Sayacı',
+          title: 'ADCSR',
         }}
       />
       <Stack.Screen
@@ -87,6 +90,11 @@ function HomeStack() {
         name="QuestionsReport"
         component={QuestionsReportScreen}
         options={{title: 'Soru Çözümlerim'}}
+      />
+      <Stack.Screen
+        name="ManQuestions"
+        component={ManQuestionsScreen}
+        options={{title: 'Soru Çözümü Ekle'}}
       />
       <Stack.Screen
         name="StudiesReport"
@@ -109,10 +117,17 @@ function HomeStack() {
         component={TimersScreen}
         options={{title: 'Sayaçlarım'}}
       />
+
+      <Stack.Screen
+        name="AddTimer"
+        component={AddTimerScreen}
+        options={{title: 'Sayaç Oluştur', tabBarVisible: false}}
+      />
+
       <Stack.Screen
         name="Guide"
         component={GuideScreen}
-        options={{title: 'Puanlar & Tercih'}}
+        options={{title: 'Puanlar'}}
       />
     </Stack.Navigator>
   );
@@ -135,7 +150,7 @@ function AsqmStack() {
       <Stack.Screen
         name="AsqmEntrance"
         component={AsqmScreen}
-        options={{title: 'Sor & Çöz'}}
+        options={{title: 'Soru Paylaş'}}
       />
       <Stack.Screen
         name="AsqmQuestions"
@@ -212,8 +227,8 @@ function App() {
       <Tab.Navigator
         initialRouteName="Feed"
         tabBarOptions={{
-          activeTintColor: '#00f',
-          inactiveTintColor: '#f00',
+          activeTintColor: '#3E74B6',
+          inactiveTintColor: 'rgb(64,64,64)',
           style: {
             backgroundColor: GlobalColors.primaryCard,
           },
@@ -235,7 +250,7 @@ function App() {
           component={AsqmStack}
           options={({route}) => ({
             tabBarVisible: getTabBarVisibility(route),
-            tabBarLabel: 'Sor & Çöz',
+            tabBarLabel: 'Soru Paylaş',
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons
                 name="chart-bubble"
@@ -246,7 +261,7 @@ function App() {
           })}
         />
 
-        <Tab.Screen
+        {/* <Tab.Screen
           name="CommStack"
           component={CommStack}
           options={({route}) => ({
@@ -260,13 +275,13 @@ function App() {
               />
             ),
           })}
-        />
+        /> */}
 
         <Tab.Screen
           name="SettingsStack"
           component={SettingsStack}
           options={{
-            tabBarLabel: 'Settings',
+            tabBarLabel: 'Hesabım',
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons name="dns" color={color} size={size} />
             ),

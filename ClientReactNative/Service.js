@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SERVICE_URL = 'https://sorusayaci.com/';
+const SERVICE_URL = 'http://192.168.1.104:5000/';
 
 const GTOKEN = '{adcsr}';
 export const AuthorizedRequestContract = {
