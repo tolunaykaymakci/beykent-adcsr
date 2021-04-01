@@ -18,11 +18,11 @@ const AsqmQuestionsScreen = ({route, navigation}) => {
 
   useEffect(() => {
     fetch(
-      'http://192.168.1.104:5000/ss/asqm/posts?&type=0&count=50&lid=' +
+      'https://sorusayaci.com/ss/asqm/posts?&type=0&count=50&lid=' +
         lessonId,
     )
       .then((response) => response.json())
-      .then((json) => setData(json.items))
+      .then((json) => {console.log(json);setData(json.items);})
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
   }, []);
@@ -31,7 +31,7 @@ const AsqmQuestionsScreen = ({route, navigation}) => {
     if (!hasScrolled) return;
 
     fetch(
-      'http://192.168.1.104:5000/ss/asqm/posts?&type=0&count=50&lid=' +
+      'https://sorusayaci.com/ss/asqm/posts?&type=0&count=50&lid=' +
         lessonId +
         '&lastid=' +
         data[data.length - 1].id,
