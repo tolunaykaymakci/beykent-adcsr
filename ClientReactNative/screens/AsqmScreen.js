@@ -26,7 +26,7 @@ const AsqmScreen = ({navigation}) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch('http://192.168.1.104:5000/ss/asqm/entrance')
+    fetch('https://sorusayaci.com/ss/asqm/entrance')
       .then((response) => response.json())
       .then((json) => {
         setData(json.lessons);

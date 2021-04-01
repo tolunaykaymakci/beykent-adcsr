@@ -5,11 +5,11 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  FlatList,
   Image,
 } from 'react-native';
 
 import GlobalStyles from '../src/GlobalStyles';
+import ReactNativeZoomableView from "@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView";
 
 const AsqmContainer = ({post, type}) => {
   return (
@@ -21,24 +21,24 @@ const AsqmContainer = ({post, type}) => {
       <View style={styles.userbar}>
         <Image
           style={{
-            height: 32,
-            width: 32,
-            borderRadius: 32 / 2,
+            height: 34,
+            width: 34,
+            borderRadius: 34 / 2,
             alignSelf: 'center',
-            marginStart: 8,
+            marginStart: 12,
           }}
           source={{uri: post.poster_pic}}
         />
 
-        <View style={{flexDirection: 'column', marginStart: 8}}>
+        <View style={{flexDirection: 'column', marginStart: 14}}>
           <Text>Soran</Text>
           <Text style={{fontWeight: 'bold'}}>@{post.poster}</Text>
         </View>
       </View>
 
       <View style={{margin: 8}}>
-        <Text style={{color: 'rgba(0, 0, 0, .6)'}}>{post.p_date}</Text>
-        <Text>{post.body}</Text>
+        <Text style={{color: 'rgba(0, 0, 0, .6)', marginStart: 6}}>{post.p_date}</Text>
+        <Text style={{marginStart: 6}}>{post.body}</Text>
 
         {/* Pictures Container */}
         {post.images != null && post.images.length > 0 ? (
@@ -49,19 +49,26 @@ const AsqmContainer = ({post, type}) => {
               flexDirection: 'row',
               marginBottom: 8,
             }}>
-            {post.images.map((imagePair) => {
+            {post.images.map((imagePair) => { 
               return (
                 <>
-                  <Image
-                    style={{
+                <ReactNativeZoomableView
+                  maxZoom={1.5}
+                  minZoom={0.5}
+                  zoomStep={0.5}
+                  initialZoom={1}
+                  bindToBorders={true}
+                  captureEvent={true}>
+                    <Image
+                    style={{ 
                       flex: 1,
                       height: 150,
-                      marginStart: 4,
+                      marginStart: 4, 
                       marginEnd: 4,
                       borderRadius: 8,
                     }}
-                    source={{uri: imagePair.thumbSrc}}
-                  />
+                    source={{uri: imagePair.src}}
+                  /></ReactNativeZoomableView>
                 </>
               );
             })}
@@ -70,18 +77,35 @@ const AsqmContainer = ({post, type}) => {
       </View>
 
       {/* Replies */}
-      <View style={{backgroundColor: 'rgb(236, 236, 236)'}}>
+      <Text 
+        style={{
+        fontWeight: 'bold',
+        marginStart: 12,
+        }}>ÜYE YORUMLARI</Text>
+      <View style={{backgroundColor: 'rgb(236, 236, 236)'}}> 
         {post.replies.map((reply) => {
           return (
             <View
               style={{
-                marginStart: '40%',
-                marginTop: 6,
+                marginStart: 12,
+                marginTop: 17,
                 marginBottom: 6,
                 marginEnd: 12,
               }}>
-              <Text style={{fontWeight: 'bold'}}>@{reply.poster}</Text>
-              <Text>{reply.body}</Text>
+            <View style={styles.userbar}>
+            <Image
+              style={{
+              height: 34,
+              width: 34,
+              borderRadius: 34 / 2,
+              alignSelf: 'center',
+            }}
+              source={{uri: reply.poster_pic}}
+            /></View>
+            <View style={{flexDirection: 'column', marginStart: 50, marginTop:-40}}>
+            <Text>Üye</Text>
+            <Text style={{fontWeight: 'bold'}}>@{reply.poster}</Text>
+            <Text style={{marginTop: 5}}>{reply.body}</Text></View>
             </View>
           );
         })}
@@ -96,10 +120,10 @@ const AsqmThreadScreen = ({route, navigation}) => {
   const [thread, setThread] = useState([]);
 
   useEffect(() => {
-    fetch('http://192.168.1.104:5000/ss/asqm/thread?pid=' + threadId)
+    fetch('https://sorusayaci.com/ss/asqm/thread?pid=' + threadId)
       .then((response) => response.json())
       .then((json) => {
-        setThread(json.thread);
+        console.log(json.thread.images);setThread(json.thread);
         // var newData = [];
         // for (var i = 0; i != json.lessons.length; i++) {
         //   let lesson = json.lessons[i];
@@ -136,7 +160,13 @@ const AsqmThreadScreen = ({route, navigation}) => {
             <Text>SORU</Text>
             <AsqmContainer post={thread} type="question" />
 
-            <Text>ÇÖZÜMLER</Text>
+            <Text style={{
+                fontWeight: 'bold',
+                marginStart: 12,
+                marginTop: 6,
+                marginBottom: 6,
+                marginEnd: 12,
+              }}>ÇÖZÜMLER</Text>
 
             {/* Answer Cards (if any) */}
             {thread.answers != null && thread.answers.length > 0 ? (
