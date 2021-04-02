@@ -10,6 +10,7 @@ import {
 
 import GlobalStyles from '../src/GlobalStyles';
 import ReactNativeZoomableView from "@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView";
+import {getRequest} from '../Service';
 
 const AsqmContainer = ({post, type}) => {
   return (
@@ -120,7 +121,7 @@ const AsqmThreadScreen = ({route, navigation}) => {
   const [thread, setThread] = useState([]);
 
   useEffect(() => {
-    fetch('https://sorusayaci.com/ss/asqm/thread?pid=' + threadId)
+    getRequest('ss/asqm/thread?pid=' + threadId)
       .then((response) => response.json())
       .then((json) => {
         console.log(json.thread.images);setThread(json.thread);

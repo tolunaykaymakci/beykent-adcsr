@@ -20,13 +20,14 @@ import {
 } from 'react-native-gesture-handler';
 
 import AsqmGridItem from '../src/components/AsqmGridItem';
+import {getRequest} from '../Service';
 
 const AsqmScreen = ({navigation}) => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch('https://sorusayaci.com/ss/asqm/entrance')
+    getRequest('ss/asqm/entrance')
       .then((response) => response.json())
       .then((json) => {
         setData(json.lessons);

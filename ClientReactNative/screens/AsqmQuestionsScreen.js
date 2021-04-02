@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import AsqmGridItem from '../src/components/AsqmGridItem';
+import {getRequest} from '../Service';
 
 const AsqmQuestionsScreen = ({route, navigation}) => {
   const {lessonId} = route.params;
@@ -17,10 +18,7 @@ const AsqmQuestionsScreen = ({route, navigation}) => {
   const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
-    fetch(
-      'https://sorusayaci.com/ss/asqm/posts?&type=0&count=50&lid=' +
-        lessonId,
-    )
+    getRequest( 'ss/asqm/posts?&type=0&count=50&lid=' + lessonId,)
       .then((response) => response.json())
       .then((json) => {console.log(json);setData(json.items);})
       .catch((error) => console.error(error))
@@ -30,12 +28,7 @@ const AsqmQuestionsScreen = ({route, navigation}) => {
   const loadMore = () => {
     if (!hasScrolled) return;
 
-    fetch(
-      'https://sorusayaci.com/ss/asqm/posts?&type=0&count=50&lid=' +
-        lessonId +
-        '&lastid=' +
-        data[data.length - 1].id,
-    )
+    getRequest('ss/asqm/posts?&type=0&count=50&lid=' + lessonId + '&lastid=' + data[data.length - 1].id,)
       .then((response) => response.json())
       .then((json) => setData([...data, ...json.items]))
       .catch((error) => console.error(error))
