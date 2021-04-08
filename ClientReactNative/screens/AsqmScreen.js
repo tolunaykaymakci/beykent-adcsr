@@ -21,6 +21,7 @@ import {
 
 import AsqmGridItem from '../src/components/AsqmGridItem';
 import {getRequest} from '../Service';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const AsqmScreen = ({navigation}) => {
   const [isLoading, setLoading] = useState(true);
@@ -88,7 +89,31 @@ const AsqmScreen = ({navigation}) => {
       <View
         style={{
           backgroundColor: 'rgb(250, 250, 250)',
+          position: 'relative',
         }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('AsqmAdd', {})}
+          style={{
+            backgroundColor: 'rgba(52, 106, 172, 1)',
+            width: 64,
+            borderRadius: 32,
+            height: 64,
+            shadowOpacity: 0.43,
+            shadowRadius: 2.62,
+            elevation: 1,
+            //position: 'absolute',
+            alignItems: 'center',
+            bottom: 0,
+            right: 0,
+            margin: 16,
+          }}>
+          <MaterialIcons
+            style={{alignSelf: 'center', marginTop: 15}}
+            name="add"
+            color={'rgb(255,255,255)'}
+            size={32}
+          />
+        </TouchableOpacity>
         {isLoading ? (
           <View
             style={{
