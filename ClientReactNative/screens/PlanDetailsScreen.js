@@ -1,6 +1,6 @@
 ﻿import React, {useEffect, useState} from 'react';
-import {View, Text, SafeAreaView, StyleSheet, ScrollView, Image, Dimensions} from 'react-native';
-import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
+import {View, Text, SafeAreaView, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions} from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {authorizedRequest} from '../Service';
@@ -27,12 +27,30 @@ const DetailsScreen = ({route, navigation}) => {
     navigation.navigate('StudiesPlan', {plan: plan})
   }
 
+
   return (
     <SafeAreaView style={{flex: 1, width:'100%', height:'100%'}}>
       {plan == null ? (
         <Text>Yükleniyor...</Text>
       ) : (
-        <View style={{alignItems:"center", width:'100%', height:'100%'}}>
+        <>
+          <TouchableOpacity style={{
+              width:50,
+              height:50,
+              borderRadius:25,
+              backgroundColor:"#A8DEFF",
+              position:"absolute",
+              right:10,
+              top:-55,
+              zIndex:1000   
+          }}>
+            <Image
+            source={require("../assest/trash.png")}
+            style={{width:30, height:30, right:-10, top:10}}
+            resizeMode="contain"
+            />
+          </TouchableOpacity>
+        <View style={{alignItems:"center", width:'100%', height:'100%', zIndex:-1}}>
           <View style={{
             justifyContent:"space-around",
             alignItems:"center",
@@ -111,7 +129,7 @@ const DetailsScreen = ({route, navigation}) => {
                     resizeMode="contain"
                 />
                 <Text style={{fontSize:16, color:"#003351"}}>
-                    Günlük Ders Programı
+                    Ders Programı Oluştur
                 </Text>
               </TouchableOpacity>
           </View>
@@ -150,7 +168,7 @@ const DetailsScreen = ({route, navigation}) => {
             )}
           />
         </View>
-
+      </>
       )}
     </SafeAreaView>
   );

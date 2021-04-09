@@ -37,6 +37,8 @@ import GuideScreen from './screens/GuideScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
 import {GlobalStyles, GlobalColors} from './src/GlobalStyles';
+import StudiesPlan from './screens/StudiesPlan';
+import AddPlan from './screens/AddPlan';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -81,6 +83,16 @@ function HomeStack() {
         name="PlanDetails"
         component={PlanDetailsScreen}
         options={{title: 'Planım'}}
+      />
+      <Stack.Screen 
+        name="AddPlan"
+        component={AddPlan}
+        options={{title:'Çalışma Planı Ekle'}}
+      />
+      <Stack.Screen
+        name="StudiesPlan"
+        component={StudiesPlan}
+        options={{title: 'Ders Programı Oluştur'}}
       />
       <Stack.Screen
         name="Plans"
