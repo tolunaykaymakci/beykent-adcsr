@@ -19,6 +19,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import AsqmScreen from './screens/AsqmScreen';
 import AsqmQuestions from './screens/AsqmQuestionsScreen';
 import AsqmThreadScreen from './screens/AsqmThreadScreen';
+import AsqmAddScreen from './screens/AsqmAddScreen';
 import CommScreen from './screens/CommScreen';
 
 // New Screens!
@@ -168,6 +169,11 @@ function AsqmStack() {
         name="AsqmQuestions"
         component={AsqmQuestions}
         options={{title: 'Sorular'}}
+      />
+      <Stack.Screen
+        name="AsqmAdd"
+        component={AsqmAddScreen}
+        options={{title: 'Soru Ekle'}}
       />
       <Stack.Screen
         name="AsqmThread"
