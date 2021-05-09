@@ -1,8 +1,16 @@
 // SS React Native
 import 'react-native-gesture-handler';
 
-import * as React from 'react';
-import {StatusBar} from 'react-native';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
+import {
+  SafeAreaView,
+  View,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
+
+import * as Progress from 'react-native-progress';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -10,7 +18,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import HomeScreen from './screens/HomeScreen';
+import HomeScreen from './screens/home/HomeScreen';
 import PlansScreen from './screens/PlansScreen';
 
 import PlanDetailsScreen from './screens/PlanDetailsScreen';
@@ -22,40 +30,65 @@ import AsqmThreadScreen from './screens/AsqmThreadScreen';
 import AsqmAddScreen from './screens/AsqmAddScreen';
 import CommScreen from './screens/CommScreen';
 
-// New Screens!
+import QuestionsReportScreen from './screens/home/QuestionsReportScreen';
+import StudiesReportScreen from './screens/home/StudiesReportScreen';
 
-import QuestionsReportScreen from './screens/QuestionsReportScreen';
-import StudiesReportScreen from './screens/StudiesReportScreen';
-
-import ManQuestionsScreen from './screens/ManQuestionsScreen';
+import ManQuestionsScreen from './screens/home/ManQuestionsScreen';
+import ManStudyScreen from './screens/home/ManStudyScreen';
 
 import RecordsScreen from './screens/RecordsScreen';
 import StatisticsScreen from './screens/StatisticsScreen';
 import TimersScreen from './screens/TimersScreen';
 import AddTimerScreen from './screens/AddTimerScreen';
 import GuideScreen from './screens/GuideScreen';
+import FriendsScreen from './screens/FriendsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
 import {GlobalStyles, GlobalColors} from './src/GlobalStyles';
+import {AsyncStorage} from 'react-native';
+import {LoginView, CreateAccountView, ResetPwdView} from './src/SignViews';
+
 import StudiesPlan from './screens/StudiesPlan';
 import AddPlan from './screens/AddPlan';
+
+import {authorizedRequest} from './Service';
+
+/* Remove These Later #TODO */
+import {LogBox} from 'react-native';
+LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
+LogBox.ignoreAllLogs(); //Ignore all log notifications
+/* Remove These Later #TODO */
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 /* We may not use this one */
 const getTabBarVisibility = (route) => {
-  const routeName = route.state
-    ? route.state.routes[route.state.index].name
-    : '';
+  try {
+    const routeName = route.state
+      ? route.state.routes[route.state.index].name
+      : '';
 
-  const hideTabsScreens = ['Plans', 'PlanDetails'];
+    const hideTabsScreens = ['Plans', 'PlanDetails'];
+    const showTabsScreens = ['Home', 'AsqmEntrance', 'CommScreen', 'Settings'];
 
-  if (hideTabsScreens.indexOf(routeName) > -1) {
+    // if (hideTabsScreens.indexOf(routeName) > -1) {
+    //   return false;
+    // }
+
+    if (
+      routeName == null ||
+      routeName == '' ||
+      showTabsScreens.indexOf(routeName) > -1
+    ) {
+      return true;
+    }
+
+    // return true;
     return false;
+  } catch {
+    return true;
   }
-
-  return true;
 };
 
 function HomeStack() {
@@ -64,13 +97,13 @@ function HomeStack() {
       initialRouteName="Home"
       screenOptions={{
         headerStyle: {
-          backgroundColor: GlobalColors.windowBackground,
+          backgroundColor: GlobalColors.headerBackground,
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 0,
         },
         headerTintColor: GlobalColors.titleText,
-        headerTitleStyle: {},
+        headerTitleStyle: {color: 'white'},
       }}>
       <Stack.Screen
         name="Home"
@@ -84,10 +117,10 @@ function HomeStack() {
         component={PlanDetailsScreen}
         options={{title: 'Planım'}}
       />
-      <Stack.Screen 
+      <Stack.Screen
         name="AddPlan"
         component={AddPlan}
-        options={{title:'Çalışma Planı Ekle'}}
+        options={{title: 'Çalışma Planı Ekle'}}
       />
       <Stack.Screen
         name="StudiesPlan"
@@ -108,6 +141,11 @@ function HomeStack() {
         name="ManQuestions"
         component={ManQuestionsScreen}
         options={{title: 'Soru Çözümü Ekle'}}
+      />
+      <Stack.Screen
+        name="ManStudy"
+        component={ManStudyScreen}
+        options={{title: 'Konu Çalışması Ekle'}}
       />
       <Stack.Screen
         name="StudiesReport"
@@ -136,11 +174,15 @@ function HomeStack() {
         component={AddTimerScreen}
         options={{title: 'Sayaç Oluştur', tabBarVisible: false}}
       />
-
       <Stack.Screen
         name="Guide"
         component={GuideScreen}
         options={{title: 'Puanlar'}}
+      />
+      <Stack.Screen
+        name="Friends"
+        component={FriendsScreen}
+        options={{title: 'Arkadaşlarım'}}
       />
     </Stack.Navigator>
   );
@@ -201,7 +243,7 @@ function CommStack() {
       <Stack.Screen
         name="CommScreen"
         component={CommScreen}
-        options={{title: 'Forum'}}
+        options={{title: 'Test'}}
       />
     </Stack.Navigator>
   );
@@ -212,14 +254,14 @@ function SettingsStack() {
     <Stack.Navigator
       initialRouteName="Settings"
       screenOptions={{
-        headerStyle: {backgroundColor: '#42f44b'},
+        headerStyle: {backgroundColor: GlobalColors.headerBackground},
         headerTintColor: '#fff',
         headerTitleStyle: {fontWeight: 'bold'},
       }}>
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{title: 'Setting Page'}}
+        options={{title: 'Profilim'}}
       />
       <Stack.Screen
         name="PlanDetails"
@@ -236,19 +278,153 @@ function SettingsStack() {
 }
 
 function App() {
+  const [layoutMode, setLayoutMode] = useState('splashMode');
+
+  useLayoutEffect(() => {
+    checkLogin();
+  }, []);
+
+  const checkLogin = async () => {
+    try {
+      const user = await AsyncStorage.getItem('login_user');
+      const pwd = await AsyncStorage.getItem('login_pwd');
+      if (user !== null && pwd !== null) {
+        global.cred = user;
+        global.pwd = pwd;
+        connectToServer();
+      } else {
+        setLayoutMode('loginMode');
+      }
+    } catch (error) {}
+  };
+
+  const connectToServer = () => {
+    authorizedRequest('api/account/info', {info_self: true})
+      .then((response) => response.json())
+      .then((json) => {
+        if (json.status && json.status == 401) {
+          setLayoutMode('loginMode');
+          return;
+        }
+
+        global.user = json;
+        setLayoutMode('appContainer');
+      })
+      .catch((error) => setLayoutMode('connectionError'))
+      .finally(() => {});
+  };
+
+  /**
+   * splashMode => Trying to connect to server
+   * appContainer => Normal running mode
+   * connectionError = Connection error layout mode
+   */
+  return layoutMode === 'appContainer' ? (
+    <AppContainer />
+  ) : layoutMode === 'splashMode' ? (
+    <SplashContainer />
+  ) : layoutMode === 'loginMode' ? (
+    <LoginView
+      create={() => setLayoutMode('signupMode')}
+      forgot={() => setLayoutMode('resetPwdMode')}
+      reload={() => checkLogin()}
+    />
+  ) : layoutMode === 'signupMode' ? (
+    <CreateAccountView reload={() => checkLogin()} />
+  ) : layoutMode === 'resetPwdMode' ? (
+    <ResetPwdView />
+  ) : (
+    <ErrorContainer tryagain={connectToServer} />
+  );
+}
+
+const ErrorContainer = ({tryagain}) => {
+  return (
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
+      <StatusBar backgroundColor={'#fff'} barStyle={'dark-content'} />
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View
+          style={{
+            marginTop: 28,
+            marginBottom: 16,
+            alignSelf: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              backgroundColor: 'purple',
+              width: 72,
+              height: 72,
+              alignSelf: 'center',
+              marginBottom: 6,
+              borderRadius: 36,
+            }}></View>
+
+          <Text style={{fontWeight: 'bold', fontSize: 16}}>
+            Servise Bağlanılamadı
+          </Text>
+          <Text style={{marginBottom: 12, fontSize: 14}}>
+            Tekrar denensin mi?
+          </Text>
+
+          <TouchableOpacity
+            onPress={() => tryagain()}
+            style={{
+              backgroundColor: 'whitesmoke',
+              padding: 16,
+              borderRadius: 12,
+            }}>
+            <Text>Tekrar Dene</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const SplashContainer = () => {
+  return (
+    <SafeAreaView style={{flex: 1, backgroundColor: '#2A4159'}}>
+      <StatusBar backgroundColor={'#2A4159'} barStyle={'light-content'} />
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View
+          style={{
+            ...GlobalStyles.primaryCard,
+            backgroundColor: '#2A4159',
+            width: 48,
+            height: 48,
+          }}>
+          <Progress.Circle
+            style={{
+              position: 'absolute',
+              margin: 12,
+              bottom: 0,
+            }}
+            color={'rgb(255,255,255)'}
+            thickness={40}
+            size={36}
+            indeterminate={true}
+          />
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const AppContainer = () => {
   return (
     <NavigationContainer>
       <StatusBar
-        backgroundColor={GlobalColors.windowBackground}
+        backgroundColor={GlobalColors.headerBackground}
         barStyle={GlobalColors.statusBarFront}
       />
       <Tab.Navigator
         initialRouteName="Feed"
         tabBarOptions={{
-          activeTintColor: '#3E74B6',
-          inactiveTintColor: 'rgb(64,64,64)',
+          activeTintColor: 'rgba(70,118,163,1)',
+          inactiveTintColor: 'rgba(0,0,0,.6)',
           style: {
-            backgroundColor: GlobalColors.primaryCard,
+            backgroundColor: 'white',
           },
         }}>
         <Tab.Screen
@@ -279,12 +455,12 @@ function App() {
           })}
         />
 
-        {/* <Tab.Screen
+        <Tab.Screen
           name="CommStack"
           component={CommStack}
           options={({route}) => ({
             tabBarVisible: getTabBarVisibility(route),
-            tabBarLabel: 'Forum',
+            tabBarLabel: 'test',
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons
                 name="chart-bubble"
@@ -293,21 +469,25 @@ function App() {
               />
             ),
           })}
-        /> */}
+        />
 
         <Tab.Screen
           name="SettingsStack"
           component={SettingsStack}
           options={{
-            tabBarLabel: 'Hesabım',
+            tabBarLabel: 'Profilim',
             tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons name="dns" color={color} size={size} />
+              <MaterialCommunityIcons
+                name="account"
+                color={color}
+                size={size}
+              />
             ),
           }}
         />
       </Tab.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 export default App;

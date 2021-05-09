@@ -1,15 +1,23 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TouchableHighlight,
+  StyleSheet,
+} from 'react-native';
 import {GlobalColors} from '../GlobalStyles';
 
 import * as Progress from 'react-native-progress';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const TouchChoose = ({title, value, loading, action}) => {
+const TouchChoose = ({title, value, loading, action, icon, titleSize}) => {
   return (
     <TouchableOpacity style={styles.container} onPress={action}>
-      <Text style={styles.titleText}>{title}</Text>
+      <Text style={{...styles.titleText, fontSize: titleSize ?? 16}}>
+        {title}
+      </Text>
 
       <View style={styles.valueContainer}>
         {loading ? (
@@ -28,9 +36,9 @@ const TouchChoose = ({title, value, loading, action}) => {
 
         <MaterialCommunityIcons
           style={{alignSelf: 'center'}}
-          name="chevron-right"
+          name={icon == null ? 'chevron-right' : icon}
           color={'rgb(58,79,101)'}
-          size={22}
+          size={23}
         />
       </View>
     </TouchableOpacity>
@@ -43,15 +51,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     backgroundColor: GlobalColors.headerSecondary,
-    borderBottomColor: GlobalColors.seperator,
+    borderBottomColor: 'rgba(0,0,0,.08)',
     paddingStart: 12,
     position: 'relative',
     paddingEnd: 12,
   },
   titleText: {
-    fontSize: 16,
     fontWeight: 'bold',
     alignSelf: 'center',
+    marginEnd: 16,
     color: GlobalColors.titleText,
   },
   valueContainer: {

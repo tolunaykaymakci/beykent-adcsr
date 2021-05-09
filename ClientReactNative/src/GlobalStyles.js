@@ -5,7 +5,7 @@ import {StyleSheet} from 'react-native';
 const currentAppTheme = 'light';
 
 export const GlobalColors = {
-  statusBarFront: currentAppTheme != 'dark' ? 'dark-content' : 'light-content',
+  statusBarFront: 'light-content',
   windowBackground: currentAppTheme != 'dark' ? '#F2F2F5' : '#181818',
   titleText: currentAppTheme != 'dark' ? '#282828' : 'rgba(255,255,255,.9)',
   subText: currentAppTheme != 'dark' ? '#4C4C4C' : 'rgba(255,255,255,.7)',
@@ -18,7 +18,9 @@ export const GlobalColors = {
   seperator:
     currentAppTheme != 'dark' ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.15)',
 
-  headerBackground: currentAppTheme != 'dark' ? '#FFF' : '#000',
+  headerBackground: 'rgba(70,118,163,1)',
+
+  accentColor: 'rgba(70,118,163,1)',
 };
 
 export const GlobalStyles = StyleSheet.create({

@@ -1,5 +1,6 @@
 import React from 'react';
 
+//const SERVICE_URL = 'http://192.168.1.104:5000/';
 const SERVICE_URL = 'https://sorusayaci.com/';
 const GTOKEN = '{adcsr}';
 export const AuthorizedRequestContract = {
@@ -19,7 +20,12 @@ export function authorizedRequest(ep, params) {
     method: 'POST',
     credentials: 'same-origin',
     mode: 'same-origin',
-    body: JSON.stringify({...params, ...AuthorizedRequestContract}),
+    body: JSON.stringify({
+      ...params,
+      ...AuthorizedRequestContract,
+      uc: global.cred,
+      up: global.pwd,
+    }),
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -51,3 +57,11 @@ export function casualRequest(ep, params) {
 
   return fetch(ep, data);
 }
+
+export function dump(o) {
+  console.log(JSON.stringify(o, null, 2));
+}
+
+export const getAuthToken = () => {
+  return GTOKEN;
+};
