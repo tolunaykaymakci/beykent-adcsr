@@ -26,7 +26,7 @@ import {GlobalColors, GlobalStyles} from '../../src/GlobalStyles';
 import TouchChoose from '../../src/components/TouchChoose';
 import {authorizedRequest} from '../../Service';
 
-import {TestDataItem, SubjectDataItem} from '../../src/components/ManDataItems';
+import {TestDataItem} from '../../src/components/ManDataItems';
 
 const width = Dimensions.get('window').width;
 

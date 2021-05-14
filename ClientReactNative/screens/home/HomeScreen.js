@@ -233,33 +233,6 @@ const HomeSummaryScreen = ({nav}) => {
             </TouchableOpacity>
           </View>
 
-          <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              style={styles.navMenuButtonLeft}
-              onPress={() =>
-                nav.navigate('SettingsStack', {screen: 'Settings'})
-              }>
-              <MaterialCommunityIcons
-                style={{alignSelf: 'center'}}
-                name="cog"
-                color={'rgb(58,79,101)'}
-                size={22}
-              />
-
-              <Text style={styles.navMenuLabel}>Ayarlarım</Text>
-            </TouchableOpacity>
-
-            <View
-              style={{
-                ...styles.navMenuButtonRight,
-                backgroundColor: 'transparent',
-                opacity: 0,
-              }}
-              onPress={() =>
-                nav.navigate('Records', {planId: mainReport.plan.plan_id})
-              }></View>
-          </View>
-
           {!planExists ? (
             <Text>Çalışma Planı Yok</Text>
           ) : (

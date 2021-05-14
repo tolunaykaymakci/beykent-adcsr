@@ -47,7 +47,7 @@ function AsqmAddScreen({route, navigation}) {
   }, []);
 
   const populateSubjects = (lid) => {
-    // Dersleri çağır
+    // Konuları çağır
     getRequest('ss/asqm/subjects?adcsr=true&lid=' + lid)
       .then((response) => response.json())
       .then((json) => {

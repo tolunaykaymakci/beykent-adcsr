@@ -85,35 +85,11 @@ const AsqmScreen = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView>
       <View
         style={{
           backgroundColor: 'rgb(250, 250, 250)',
-          position: 'relative',
         }}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('AsqmAdd', {})}
-          style={{
-            backgroundColor: 'rgba(52, 106, 172, 1)',
-            width: 64,
-            borderRadius: 32,
-            height: 64,
-            shadowOpacity: 0.43,
-            shadowRadius: 2.62,
-            elevation: 1,
-            //position: 'absolute',
-            alignItems: 'center',
-            bottom: 0,
-            right: 0,
-            margin: 16,
-          }}>
-          <MaterialIcons
-            style={{alignSelf: 'center', marginTop: 15}}
-            name="add"
-            color={'rgb(255,255,255)'}
-            size={32}
-          />
-        </TouchableOpacity>
         {isLoading ? (
           <View
             style={{
@@ -166,6 +142,34 @@ const AsqmScreen = ({navigation}) => {
             ))}
           </ScrollView>
         )}
+      </View>
+
+      <View
+        style={{
+          bottom: 0,
+          right: 0,
+          position: 'absolute',
+        }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('AsqmAdd', {})}
+          style={{
+            backgroundColor: 'rgba(52, 106, 172, 1)',
+            width: 64,
+            borderRadius: 32,
+            height: 64,
+            shadowOpacity: 0.43,
+            shadowRadius: 2.62,
+            elevation: 1,
+            alignItems: 'center',
+            margin: 16,
+          }}>
+          <MaterialIcons
+            style={{alignSelf: 'center', marginTop: 15}}
+            name="add"
+            color={'rgb(255,255,255)'}
+            size={32}
+          />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

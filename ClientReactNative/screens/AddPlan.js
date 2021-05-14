@@ -1,126 +1,230 @@
-import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Modal, ScrollView, Image, StyleSheet} from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  TextInput,
+  Image,
+  StyleSheet,
+} from 'react-native';
+import {authorizedRequest, dump, getRequest} from '../Service';
 
-export default class AddPlan extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-        isVisible:false,
-        selected:null,
-    };
-  }
+const AddPlan = ({navigation}) => {
+  const [examText, setExamText] = useState();
+  const [pickerVisible, setPickerVisible] = useState(false);
+  const [planName, setPlanName] = useState();
+  const [exams, setExams] = useState();
 
+  const knownExams = useRef();
+  const selectedUid = useRef();
 
-  onHandle = (item) =>{
-    this.setState({
-        selected:item,
-        isVisible:false,
+  useEffect(() => {
+    getRequest('ss/sdb/get-known-exams', {})
+      .then((response) => response.json())
+      .then((json) => {
+        knownExams.current = json.known_exams;
+        setExams(knownExams.current);
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {});
+  }, []);
+
+  const createPlan = () => {
+    authorizedRequest('ss/sdb/plans/new', {
+      plan: {exam_uid: selectedUid.current, name: planName},
     })
-  }
+      .then((response) => {
+        navigation.goBack();
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {});
+  };
 
-
-  render() {
-    const data = [
-        {
-            id:1,
-            name:"Liseye Geçiş Sınavı (LGS)",
-        },
-        {
-            id:2,
-            name:"Yükseköğretim Kurumları Sınavı (YKS)",
-        },
-        {
-            id:3,
-            name:"Kamu Personeli Seçme Sınavı (KPSS)",
-        },
-        {
-            id:4,
-            name:"Dikey Geçiş Sınavı (DGS)",
-        },
-        {
-            id:5,
-            name:"Akademik Personel ve Lisansüstü Sınavı (ALES)",
-        },
-        
-    ]
-
-    return (
-      <View style={{padding:'5%'}} >
-        <View style={{
-            backgroundColor:"#A8DEFF",
-            width:'100%',
-            height:'31%',
-            borderRadius:20,
-            shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height:2,
-                  },
-                  shadowOpacity: 0.50,
-                  shadowRadius: 20,
+  return (
+    exams !== null && (
+      <View style={{padding: '5%'}}>
+        <TouchableOpacity
+          onPress={() => setPickerVisible(true)}
+          style={{
+            backgroundColor: '#A8DEFF',
+            width: '100%',
+            height: 64,
+            borderRadius: 20,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.5,
+            shadowRadius: 20,
+          }}>
+          <View
+            style={{
+              backgroundColor: 'white',
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+              right: -5,
+              top: 7,
             }}>
-            <TouchableOpacity style={{
-                backgroundColor:'white', 
-                width:50, 
-                height:50, 
-                borderRadius:25,
-                right:-5,
-                top: 5
-            }}
-                onPress={()=>this.setState({isVisible:true})}
-            >  
-                <Image
-                    source={require("../assest/arrow.png")}
-                    style={{width:30, height:30, right:-10, top:10}}
-                    resizeMode="contain"
-                />
-            </TouchableOpacity>
-            
-            <Text style={{fontSize:16, color:"#003351", right:-70, top: -37}}>Çalıştığınız Sınav</Text>
-            <Text style={{fontSize:14, color:"#003351", right:-70, top: -33}}>Seçmek için dokunun.</Text>
-        </View>
-        <View>
-            { this.state.selected !== null &&
-                <Text>
-                    {this.state.selected.name}      
-                </Text>
-            }
-        </View>
+            <Image
+              source={require('../assest/arrow.png')}
+              style={{width: 30, height: 30, right: -10, top: 10}}
+              resizeMode="contain"
+            />
+          </View>
 
+          <Text style={{fontSize: 16, color: '#003351', right: -70, top: -37}}>
+            Çalıştığınız Sınav
+          </Text>
+          <Text style={{fontSize: 14, color: '#003351', right: -70, top: -33}}>
+            {examText ?? 'Seçmek için dokunun'}
+          </Text>
+        </TouchableOpacity>
 
-        <Modal 
-            visible={this.state.isVisible}
-            transparent={true}
-        >
-            <View 
+        {examText == null ? (
+          <></>
+        ) : (
+          <>
+            <View
+              onPress={() => setPickerVisible(true)}
+              style={{
+                backgroundColor: '#A8DEFF',
+                width: '100%',
+                height: 76,
+                borderRadius: 20,
+                shadowColor: '#000',
+                marginTop: 12,
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.5,
+                shadowRadius: 20,
+              }}>
+              <View
                 style={{
-                    backgroundColor:'rgba(0,0,0,0.5)',
-                    flex:1,
-                    width:'100%',
-                    justifyContent:'flex-end'
-                }}
-            >
-                <View style={{height:'40%', width:'100%', backgroundColor:"white"}}>
-                    <ScrollView>
-                    {data.map((item, key)=>(
-                        <TouchableOpacity key={key} style={{
-                            width:'100%', height:70, backgroundColor:"white",
-                            alignItems:'center',
-                            justifyContent:'center'
-                        }} 
-                            onPress={()=>this.onHandle(item)}
-                        >
-                            <Text style={{fontSize:16, top:10}}>
-                                {item.name}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                    </ScrollView>
-                </View>
+                  backgroundColor: 'white',
+                  width: 50,
+                  height: 50,
+                  borderRadius: 25,
+                  right: -5,
+                  top: 14,
+                }}>
+                <Image
+                  source={require('../assest/notebook.png')}
+                  style={{width: 30, height: 30, right: -10, top: 10}}
+                  resizeMode="contain"
+                />
+              </View>
+
+              <Text
+                style={{fontSize: 16, color: '#003351', right: -70, top: -37}}>
+                Planınızın İsmi
+              </Text>
+
+              <View style={styles.inputView}>
+                <TextInput
+                  style={styles.inputText}
+                  placeholder="Yazmak için dokunun"
+                  placeholderTextColor="#003f5c"
+                  autoCapitalize="none"
+                  value={planName ?? 'Plan ismim'}
+                  onChangeText={(text) => setPlanName(text)}
+                />
+              </View>
             </View>
 
-        </Modal>
+            <TouchableOpacity
+              onPress={() => createPlan()}
+              style={{
+                backgroundColor: '#A8DEFF',
+                width: 64,
+                height: 64,
+                alignSelf: 'flex-end',
+                marginTop: 12,
+                borderRadius: 32,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Image
+                source={require('../assest/save.png')}
+                style={{width: 30, height: 30}}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </>
+        )}
+
+        {exams == null ? (
+          <></>
+        ) : (
+          <Modal visible={pickerVisible} transparent={true}>
+            <View
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                flex: 1,
+                width: '100%',
+                justifyContent: 'flex-end',
+              }}>
+              <View
+                style={{
+                  height: '40%',
+                  width: '100%',
+                  backgroundColor: 'white',
+                }}>
+                <ScrollView>
+                  {exams.map((exam, index) => (
+                    <TouchableOpacity
+                      key={exam.exam_uid}
+                      style={{
+                        width: '100%',
+                        height: 70,
+                        backgroundColor: 'white',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      onPress={() => {
+                        selectedUid.current = exam.exam_uid;
+                        setPickerVisible(false);
+                        setExamText(exam.title);
+                        setPlanName(exam.acronym + ' Planım');
+                      }}>
+                      <Text style={{fontSize: 16, top: 10}}>
+                        {exam.title + ' (' + exam.acronym + ')'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+          </Modal>
+        )}
       </View>
-    );
-  }
-}
+    )
+  );
+};
+
+const styles = StyleSheet.create({
+  inputView: {
+    width: '76%',
+    backgroundColor: 'rgba(255,255,255,.54)',
+    borderRadius: 14,
+    height: 32,
+    marginTop: -32,
+    right: -68,
+    justifyContent: 'center',
+    paddingTop: 12,
+    paddingBottom: 9,
+    paddingStart: 9,
+    paddingEnd: 9,
+  },
+  inputText: {
+    height: 34,
+    color: 'black',
+  },
+});
+
+export default AddPlan;

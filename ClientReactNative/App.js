@@ -48,7 +48,7 @@ import {GlobalStyles, GlobalColors} from './src/GlobalStyles';
 import {AsyncStorage} from 'react-native';
 import {LoginView, CreateAccountView, ResetPwdView} from './src/SignViews';
 
-import StudiesPlan from './screens/StudiesPlan';
+import StudyProgram from './screens/StudyProgram';
 import AddPlan from './screens/AddPlan';
 
 import {authorizedRequest} from './Service';
@@ -62,19 +62,13 @@ LogBox.ignoreAllLogs(); //Ignore all log notifications
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-/* We may not use this one */
 const getTabBarVisibility = (route) => {
   try {
     const routeName = route.state
       ? route.state.routes[route.state.index].name
       : '';
 
-    const hideTabsScreens = ['Plans', 'PlanDetails'];
     const showTabsScreens = ['Home', 'AsqmEntrance', 'CommScreen', 'Settings'];
-
-    // if (hideTabsScreens.indexOf(routeName) > -1) {
-    //   return false;
-    // }
 
     if (
       routeName == null ||
@@ -84,7 +78,6 @@ const getTabBarVisibility = (route) => {
       return true;
     }
 
-    // return true;
     return false;
   } catch {
     return true;
@@ -109,7 +102,7 @@ function HomeStack() {
         name="Home"
         component={HomeScreen}
         options={{
-          title: 'ADCSR',
+          title: 'Çalış',
         }}
       />
       <Stack.Screen
@@ -123,9 +116,9 @@ function HomeStack() {
         options={{title: 'Çalışma Planı Ekle'}}
       />
       <Stack.Screen
-        name="StudiesPlan"
-        component={StudiesPlan}
-        options={{title: 'Ders Programı Oluştur'}}
+        name="StudyProgram"
+        component={StudyProgram}
+        options={{title: 'Ders Programı'}}
       />
       <Stack.Screen
         name="Plans"
