@@ -7,7 +7,7 @@ const TransmissionSteps = {
   Completed: 2,
 };
 
-const DATA_PACKET_SIZE = 65536;
+const DATA_PACKET_SIZE = 4096;
 
 let DataTransmission = function () {
   this.dataBytes = [];
@@ -116,7 +116,7 @@ let DataTransmission = function () {
       }
 
       var calculation = (currentBytes * 100) / totalBytes;
-      if (!isFinite(result)) {
+      if (!isFinite(calculation)) {
         calculation = 0;
       }
 

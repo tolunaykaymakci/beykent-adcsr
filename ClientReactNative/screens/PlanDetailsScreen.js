@@ -5,35 +5,75 @@ import {
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  Alert,
   Image,
   Dimensions,
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {authorizedRequest} from '../Service';
+import {authorizedRequest, dump} from '../Service';
+import {useIsFocused} from '@react-navigation/native';
 
 const width = Dimensions.get('window').width;
 
 const DetailsScreen = ({route, navigation}) => {
   const {planId} = route.params;
   const [plan, setPlan] = useState();
+  const [program, setProgram] = useState('none');
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    getPlan();
+  }, [isFocused]);
+
+  const getPlan = () => {
     authorizedRequest('ss/sdb/plan', {
       plan_id: planId,
     })
       .then((response) => response.json())
       .then((json) => {
         setPlan(json.plan);
+        setProgram(json.plan.program_type ?? 'none');
       })
       .catch((error) => console.error(error))
       .finally(() => {});
-  }, []);
+  };
 
-  const onDayPlan = () => {
-    navigation.navigate('StudyProgram', {plan: plan});
+  const goToStudyProgram = (mode) =>
+    navigation.navigate('StudyProgram', {plan, mode});
+
+  const deleteStudyProgram = () => {
+    Alert.alert('Programı Sil?', 'Ders programınız silinsin mi?', [
+      {
+        text: 'Vazgeç',
+        style: 'cancel',
+      },
+      {
+        text: 'Evet, sil',
+        onPress: () => {
+          authorizedRequest('ss/sdb/plans/program/delete', {
+            plan_id: plan.plan_id,
+          })
+            .then((response) => setProgram('none'))
+            .catch((error) => console.error(error))
+            .finally(() => {});
+        },
+      },
+    ]);
+  };
+
+  const deleteStudyPlan = () => {
+    Alert.alert(
+      'Planı Sil? (Dikkat!)',
+      'Bu çalışma planını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!',
+      [
+        {
+          text: 'Vazgeç',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'Evet, sil', onPress: () => console.log('OK Pressed')},
+      ],
+    );
   };
 
   return (
@@ -43,6 +83,7 @@ const DetailsScreen = ({route, navigation}) => {
       ) : (
         <>
           <TouchableOpacity
+            onPress={deleteStudyPlan}
             style={{
               width: 50,
               height: 50,
@@ -54,7 +95,7 @@ const DetailsScreen = ({route, navigation}) => {
               zIndex: 1000,
             }}>
             <Image
-              source={require('../assest/trash.png')}
+              source={require('../assets/trash.png')}
               style={{width: 30, height: 30, right: -10, top: 10}}
               resizeMode="contain"
             />
@@ -73,7 +114,6 @@ const DetailsScreen = ({route, navigation}) => {
                 alignItems: 'center',
                 backgroundColor: '#A8DEFF',
                 width: '90%',
-                height: '20%',
                 padding: '3%',
                 borderRadius: 20,
                 shadowColor: '#000',
@@ -93,7 +133,7 @@ const DetailsScreen = ({route, navigation}) => {
                   justifyContent: 'space-between',
                 }}>
                 <Image
-                  source={require('../assest/exam.png')}
+                  source={require('../assets/exam.png')}
                   style={{width: 30, height: 30}}
                   resizeMode="contain"
                 />
@@ -109,7 +149,7 @@ const DetailsScreen = ({route, navigation}) => {
                   justifyContent: 'space-between',
                 }}>
                 <Image
-                  source={require('../assest/name.png')}
+                  source={require('../assets/name.png')}
                   style={{width: 30, height: 30}}
                   resizeMode="contain"
                 />
@@ -125,7 +165,7 @@ const DetailsScreen = ({route, navigation}) => {
                   justifyContent: 'space-between',
                 }}>
                 <Image
-                  source={require('../assest/calendar.png')}
+                  source={require('../assets/calendar.png')}
                   style={{width: 30, height: 30}}
                   resizeMode="contain"
                 />
@@ -140,7 +180,6 @@ const DetailsScreen = ({route, navigation}) => {
                 backgroundColor: '#A8DEFF',
                 padding: '3%',
                 width: '90%',
-                height: '20%',
                 marginTop: 20,
                 borderRadius: 20,
                 shadowColor: '#000',
@@ -157,26 +196,74 @@ const DetailsScreen = ({route, navigation}) => {
               </Text>
               <Text style={{fontSize: 13, color: '#003351'}}>
                 Bir ders programı oluşturarak kendinize günlük soru hedefleri
-                belirleyebilirsiniz. Soru sayacı hedefinize ulaşmanıza yardımcı
-                olacaktır.
+                belirleyebilirsiniz. Hedefinize ulaşmanıza yardımcı olacağız!
               </Text>
-              <TouchableOpacity
-                style={{
-                  width: '100%',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                }}
-                onPress={onDayPlan}>
-                <Image
-                  source={require('../assest/notebook.png')}
-                  style={{width: 30, height: 30}}
-                  resizeMode="contain"
-                />
-                <Text style={{fontSize: 16, color: '#003351'}}>
-                  Ders Programı Oluştur
-                </Text>
-              </TouchableOpacity>
+
+              {program === 'none' ? (
+                <TouchableOpacity
+                  style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                  }}
+                  onPress={() => goToStudyProgram('create')}>
+                  <Image
+                    source={require('../assets/notebook.png')}
+                    style={{width: 30, height: 30}}
+                    resizeMode="contain"
+                  />
+                  <Text style={{fontSize: 16, color: '#003351'}}>
+                    Ders Programı Oluştur
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <View>
+                  <Text style={{marginTop: 4, marginBottom: 4, fontSize: 15}}>
+                    {program === 'fixed'
+                      ? 'Sabit Ders Programı'
+                      : program === 'daily'
+                      ? 'Günlük Ders Programı'
+                      : 'Haftalık Ders Programı'}
+                  </Text>
+                  <View style={{flexDirection: 'row-reverse'}}>
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                      }}
+                      onPress={deleteStudyProgram}>
+                      <Image
+                        source={require('../assets/trash.png')}
+                        style={{width: 30, height: 30}}
+                        resizeMode="contain"
+                      />
+                      <Text style={{fontSize: 16, color: '#003351'}}>
+                        Programı Sil
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        marginEnd: 8,
+                      }}
+                      onPress={() => goToStudyProgram('edit')}>
+                      <Image
+                        source={require('../assets/edit.png')}
+                        style={{width: 30, height: 30}}
+                        resizeMode="contain"
+                      />
+                      <Text style={{fontSize: 16, color: '#003351'}}>
+                        Düzenle
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
             </View>
             <FlatList
               data={plan.lessons}
@@ -212,7 +299,7 @@ const DetailsScreen = ({route, navigation}) => {
                     elevation: 10,
                   }}>
                   <Image
-                    source={require('../assest/study.png')}
+                    source={require('../assets/study.png')}
                     style={{width: 50, height: 50}}
                     resizeMode="contain"
                   />

@@ -34,13 +34,23 @@ let AsqmPostTransmission = function () {
   this.setPostImages = function (...images) {
     const DESIRED_BITMAP_SIZE = 1500;
 
-    //this.originalBitmaps = images;
     this.transmitter.dataBytes = [];
     this.transmitter.request.ds = [];
 
-    images.forEach((image, index) => {
-      this.transmitter.dataBytes[index] = base64.decode(image.base64);
-      this.transmitter.request.ds[index] = image.fileSize;
+    var Buffer = require('buffer/').Buffer;
+
+    images.forEach((image) => {
+      let bytes = Buffer.from(image.base64, 'base64');
+      var sbytes = [];
+
+      // Convert byte[] to sbyte[] because server prefers that
+      for (var b = 0; b != bytes.length; b++) {
+        var sbyte = (bytes[b] & 127) - (bytes[b] & 128);
+        sbytes.push(sbyte);
+      }
+
+      this.transmitter.dataBytes.push(sbytes);
+      this.transmitter.request.ds.push(image.fileSize);
     });
   };
 

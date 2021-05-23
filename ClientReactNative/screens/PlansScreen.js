@@ -66,7 +66,7 @@ const PlansScreen = ({navigation}) => {
       {plans.length === 0 ? (
         <View style={{alignItems: 'center', marginTop: 64}}>
           <Image
-            source={require('../assest/study.png')}
+            source={require('../assets/study.png')}
             style={{width: 70, height: 70, margin: 12}}
             resizeMode="contain"
           />
@@ -86,11 +86,11 @@ const PlansScreen = ({navigation}) => {
       ) : (
         plans.map((r) => (
           <TouchableOpacity
+            style={{margin: 12}}
             key={r.plan_id}
             onPress={() => goToPlanDetails(r.plan_id)}>
             <View style={styles.planView}>
-              <View
-                style={{alignItems: 'center', width: '100%', height: '100%'}}>
+              <View style={{alignItems: 'center', height: '100%'}}>
                 <View
                   style={{
                     justifyContent: 'space-around',
@@ -119,7 +119,7 @@ const PlansScreen = ({navigation}) => {
                     {r.created}
                   </Text>
                   <Image
-                    source={require('../assest/name.png')}
+                    source={require('../assets/name.png')}
                     style={{width: 50, height: 50, right: 150, top: -5}}
                     resizeMode="contain"
                   />
@@ -152,7 +152,7 @@ const PlansScreen = ({navigation}) => {
           margin: 16,
         }}>
         <Image
-          source={require('../assest/add.webp')}
+          source={require('../assets/add.webp')}
           style={{width: 60, height: 60}}
           resizeMode="contain"
         />

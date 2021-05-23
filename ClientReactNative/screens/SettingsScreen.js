@@ -38,7 +38,7 @@ const SettingsScreen = ({route, navigation}) => {
               source={
                 global.user.p_img != null
                   ? {uri: 'https://reactnative.dev/img/tiny_logo.png'}
-                  : require('../assest/profile_default.png')
+                  : require('../assets/profile_default.png')
               }
               style={{
                 width: 70,

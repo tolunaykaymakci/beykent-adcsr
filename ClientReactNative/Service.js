@@ -32,11 +32,7 @@ export function authorizedRequest(ep, params) {
     },
   };
 
-  if (ep.indexOf('://') < 0) {
-    ep = SERVICE_URL + ep;
-  }
-
-  return fetch(ep, data);
+  return fetch(makeApiep(ep), data);
 }
 
 export function casualRequest(ep, params) {
@@ -51,11 +47,7 @@ export function casualRequest(ep, params) {
     },
   };
 
-  if (ep.indexOf('://') < 0) {
-    ep = SERVICE_URL + ep;
-  }
-
-  return fetch(ep, data);
+  return fetch(makeApiep(ep), data);
 }
 
 export function dump(o) {
@@ -64,4 +56,11 @@ export function dump(o) {
 
 export const getAuthToken = () => {
   return GTOKEN;
+};
+
+export const makeApiep = (ep) => {
+  if (ep.indexOf('://') < 0) {
+    ep = SERVICE_URL + ep;
+  }
+  return ep;
 };

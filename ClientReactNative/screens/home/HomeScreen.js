@@ -20,7 +20,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {WebView} from 'react-native-webview';
 
-import {authorizedRequest, getAuthToken} from '../../Service';
+import {authorizedRequest, getAuthToken, makeApiep} from '../../Service';
 import moment from 'moment';
 
 const HomeScreen = ({navigation}) => {
@@ -66,13 +66,11 @@ const HomeSummaryScreen = ({nav}) => {
   const [loadingMain, setLoadingMain] = useState(true);
   const [loadingQReports, setLoadingQReports] = useState(true);
   const [loadingSReports, setLoadingSReports] = useState(true);
-  const [loadingRecords, setLoadingRecords] = useState(true);
   const [loadingTimers, setLoadingTimers] = useState(true);
 
   const [mainReport, setMainReport] = useState();
   const [qReportData, setQReportData] = useState();
   const [sReportData, setSReportData] = useState();
-  const [recordsData, setRecordsData] = useState();
   const [timersData, setTimersData] = useState();
 
   const [planExists, setPlanExists] = useState(false);
@@ -134,15 +132,6 @@ const HomeSummaryScreen = ({nav}) => {
       .catch((error) => console.error(error))
       .finally(() => {});
 
-    authorizedRequest('api/app/home/recs', {})
-      .then((response) => response.json())
-      .then((json) => {
-        setRecordsData(json);
-        setLoadingRecords(false);
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {});
-
     authorizedRequest('api/app/home/timr', {})
       .then((response) => response.json())
       .then((json) => {
@@ -172,10 +161,6 @@ const HomeSummaryScreen = ({nav}) => {
         </View>
       ) : (
         <ScrollView style={{flex: 1, marginStart: 0, marginEnd: 0}}>
-          {/* <Button
-            title="Test WebView"
-            onPress={() => nav.navigate('TestScreen', {})}></Button> */}
-
           {/* Navigation menu */}
           <View style={{flexDirection: 'row', marginTop: 12}}>
             <TouchableOpacity
@@ -216,7 +201,7 @@ const HomeSummaryScreen = ({nav}) => {
                 size={22}
               />
 
-              <Text style={styles.navMenuLabel}>Puanlar & Tercih</Text>
+              <Text style={styles.navMenuLabel}>Puan Hesapla</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -296,21 +281,22 @@ const HomeSummaryScreen = ({nav}) => {
                     flexDirection: 'row',
                     marginTop: 12,
                     marginEnd: 5,
-                    borderColor: '#30457a',
-                    borderRadius: 12,
-                    borderWidth: 1,
                     position: 'absolute',
                     right: 0,
                   }}>
                   <Text
-                    style={{alignSelf: 'center', marginLeft: 9, fontSize: 13}}>
-                    BUGÜN
+                    style={{
+                      fontFamily: 'sans-serif-medium',
+                      alignSelf: 'center',
+                      fontSize: 16,
+                    }}>
+                    320 SORU, 6 TEST
                   </Text>
 
                   <MaterialCommunityIcons
                     style={{alignSelf: 'center'}}
                     name="chevron-right"
-                    color={'rgba(58,79,101,0)'}
+                    color={'rgba(58,79,101,1)'}
                     size={24}
                   />
                 </TouchableOpacity>
@@ -339,67 +325,6 @@ const HomeSummaryScreen = ({nav}) => {
                     opacity: loadingQReports ? 0 : 1,
                     width: '100%',
                   }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignSelf: 'center',
-                      marginTop: 12,
-                    }}>
-                    <Text style={{fontSize: 16, color: GlobalColors.titleText}}>
-                      Bugün
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 'bold',
-                        marginStart: 4,
-                        marginEnd: 4,
-                        color: GlobalColors.titleText,
-                      }}>
-                      310
-                    </Text>
-                    <Text style={{fontSize: 16, color: GlobalColors.titleText}}>
-                      soru çözüldü
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignSelf: 'center',
-                      marginTop: 5,
-                    }}>
-                    <MaterialIcons
-                      style={{alignSelf: 'center', marginEnd: 3}}
-                      name="gesture"
-                      color={'rgb(58,79,101)'}
-                      size={17}
-                    />
-                    <Text>1 ders</Text>
-                    <MaterialIcons
-                      style={{
-                        alignSelf: 'center',
-                        marginStart: 12,
-                        marginEnd: 3,
-                      }}
-                      name="library-books"
-                      color={'rgb(58,79,101)'}
-                      size={17}
-                    />
-                    <Text>1 konu</Text>
-                    <MaterialIcons
-                      style={{
-                        alignSelf: 'center',
-                        marginStart: 12,
-                        marginEnd: 3,
-                      }}
-                      name="insert-drive-file"
-                      color={'rgb(58,79,101)'}
-                      size={17}
-                    />
-                    <Text>4 test</Text>
-                  </View>
-
                   {/* Questions Graph */}
                   <WebView
                     ref={quesGraph}
@@ -410,7 +335,7 @@ const HomeSummaryScreen = ({nav}) => {
                       marginStart: 12,
                       marginEnd: 12,
                     }}
-                    source={{uri: 'grpfr'}}
+                    source={{uri: makeApiep('grpfr')}}
                     bounces={false}
                     showsHorizontalScrollIndicator={false}
                     scrollEnabled={false}
@@ -575,7 +500,7 @@ const HomeSummaryScreen = ({nav}) => {
                       marginStart: 12,
                       marginEnd: 12,
                     }}
-                    source={{uri: 'grpfr'}}
+                    source={{uri: makeApiep('grpfr')}}
                     bounces={false}
                     showsHorizontalScrollIndicator={false}
                     scrollEnabled={false}
@@ -652,35 +577,6 @@ const HomeSummaryScreen = ({nav}) => {
                       marginBottom: 14,
                     }}>
                     Planım
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={{
-                    ...GlobalStyles.primaryCard,
-                    ...GlobalStyles.homeCard,
-                    marginStart: 3,
-                    marginEnd: 3,
-                    flexDirection: 'column',
-                    height: 'auto',
-                  }}
-                  onPress={() =>
-                    nav.navigate('Records', {planId: mainReport.plan.plan_id})
-                  }>
-                  <MaterialCommunityIcons
-                    style={{alignSelf: 'center', marginTop: 14}}
-                    name="file-document"
-                    color={'rgb(58,79,101)'}
-                    size={26}
-                  />
-
-                  <Text
-                    style={{
-                      alignSelf: 'center',
-                      marginTop: 4,
-                      marginBottom: 14,
-                    }}>
-                    Kayıtlarım
                   </Text>
                 </TouchableOpacity>
 
@@ -773,22 +669,6 @@ const HomeSummaryScreen = ({nav}) => {
               />
             </View>
           )}
-
-          {/* Home Footer */}
-
-          <Text style={{fontSize: 21, marginTop: 24, alignSelf: 'center'}}>
-            ADCSR
-          </Text>
-
-          <Text
-            style={{
-              fontSize: 14,
-              marginTop: 3,
-              marginBottom: 12,
-              alignSelf: 'center',
-            }}>
-            Uygulama Sürümü
-          </Text>
         </ScrollView>
       )}
     </View>

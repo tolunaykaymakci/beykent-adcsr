@@ -70,7 +70,7 @@ const AddPlan = ({navigation}) => {
               top: 7,
             }}>
             <Image
-              source={require('../assest/arrow.png')}
+              source={require('../assets/arrow.png')}
               style={{width: 30, height: 30, right: -10, top: 10}}
               resizeMode="contain"
             />
@@ -114,7 +114,7 @@ const AddPlan = ({navigation}) => {
                   top: 14,
                 }}>
                 <Image
-                  source={require('../assest/notebook.png')}
+                  source={require('../assets/notebook.png')}
                   style={{width: 30, height: 30, right: -10, top: 10}}
                   resizeMode="contain"
                 />
@@ -150,7 +150,7 @@ const AddPlan = ({navigation}) => {
                 alignItems: 'center',
               }}>
               <Image
-                source={require('../assest/save.png')}
+                source={require('../assets/save.png')}
                 style={{width: 30, height: 30}}
                 resizeMode="contain"
               />

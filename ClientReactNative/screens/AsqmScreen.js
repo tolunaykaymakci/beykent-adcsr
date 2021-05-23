@@ -9,6 +9,7 @@ import {
   SectionList,
   StyleSheet,
   ScrollView,
+  RefreshControl,
   FlatList,
   ActivityIndicator,
   Image,
@@ -23,11 +24,18 @@ import AsqmGridItem from '../src/components/AsqmGridItem';
 import {getRequest} from '../Service';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
+import {useIsFocused} from '@react-navigation/native';
+
 const AsqmScreen = ({navigation}) => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    requestEntrance();
+  }, []);
+
+  const requestEntrance = () => {
     getRequest('ss/asqm/entrance')
       .then((response) => response.json())
       .then((json) => {
@@ -46,7 +54,7 @@ const AsqmScreen = ({navigation}) => {
       })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
-  }, []);
+  };
 
   const TestHeader = ({title, count, id, navigation}) => {
     return (
@@ -84,6 +92,11 @@ const AsqmScreen = ({navigation}) => {
     );
   };
 
+  const onRefresh = React.useCallback(() => {
+    setLoading(true);
+    requestEntrance();
+  }, []);
+
   return (
     <SafeAreaView>
       <View
@@ -101,10 +114,13 @@ const AsqmScreen = ({navigation}) => {
             <Text>Yükleniyor... bir sn lütfen</Text>
           </View>
         ) : (
-          <ScrollView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
+            }>
             <View
               style={{
-                height: 140,
+                height: 130,
                 backgroundColor: '#6d91bd',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -121,56 +137,61 @@ const AsqmScreen = ({navigation}) => {
                 onların sorduğu sorulara gözatabilirsin!
               </Text>
             </View>
-            {data.map((item) => (
-              <View style={{paddingStart: 6, paddingEnd: 6}}>
-                <TestHeader
-                  title={item.name}
-                  id={item.id}
-                  navigation={navigation}
-                  count={item.pc}
-                />
+            {data.map(
+              (item) =>
+                item.pc !== 0 && (
+                  <View style={{paddingStart: 6, paddingEnd: 6}}>
+                    <TestHeader
+                      title={item.name}
+                      id={item.id}
+                      navigation={navigation}
+                      count={item.pc}
+                    />
 
-                <FlatList
-                  data={item.mostRecentPosts}
-                  horizontal
-                  keyExtractor={({id}, index) => id}
-                  renderItem={({item}) => (
-                    <AsqmGridItem post={item} navigation={navigation} />
-                  )}
-                />
-              </View>
-            ))}
+                    <FlatList
+                      data={item.mostRecentPosts}
+                      horizontal
+                      keyExtractor={({id}, index) => id}
+                      renderItem={({item}) => (
+                        <AsqmGridItem post={item} navigation={navigation} />
+                      )}
+                    />
+                  </View>
+                ),
+            )}
           </ScrollView>
         )}
       </View>
 
-      <View
-        style={{
-          bottom: 0,
-          right: 0,
-          position: 'absolute',
-        }}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('AsqmAdd', {})}
+      {!isLoading && (
+        <View
           style={{
-            backgroundColor: 'rgba(52, 106, 172, 1)',
-            width: 64,
-            borderRadius: 32,
-            height: 64,
-            shadowOpacity: 0.43,
-            shadowRadius: 2.62,
-            elevation: 1,
-            alignItems: 'center',
-            margin: 16,
+            bottom: 0,
+            right: 0,
+            position: 'absolute',
           }}>
-          <MaterialIcons
-            style={{alignSelf: 'center', marginTop: 15}}
-            name="add"
-            color={'rgb(255,255,255)'}
-            size={32}
-          />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('AsqmAdd', {})}
+            style={{
+              backgroundColor: 'rgba(52, 106, 172, 1)',
+              width: 64,
+              borderRadius: 32,
+              height: 64,
+              shadowOpacity: 0.43,
+              shadowRadius: 2.62,
+              elevation: 1,
+              alignItems: 'center',
+              margin: 16,
+            }}>
+            <MaterialIcons
+              style={{alignSelf: 'center', marginTop: 15}}
+              name="add"
+              color={'rgb(255,255,255)'}
+              size={32}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 };

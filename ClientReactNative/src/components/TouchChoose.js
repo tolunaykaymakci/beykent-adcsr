@@ -12,9 +12,22 @@ import {GlobalColors} from '../GlobalStyles';
 import * as Progress from 'react-native-progress';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const TouchChoose = ({title, value, loading, action, icon, titleSize}) => {
+const TouchChoose = ({
+  title,
+  value,
+  loading,
+  action,
+  icon,
+  titleSize,
+  backColor,
+}) => {
   return (
-    <TouchableOpacity style={styles.container} onPress={action}>
+    <TouchableOpacity
+      style={{
+        ...styles.container,
+        backgroundColor: backColor ?? GlobalColors.primaryCard,
+      }}
+      onPress={action}>
       <Text style={{...styles.titleText, fontSize: titleSize ?? 16}}>
         {title}
       </Text>

@@ -96,7 +96,7 @@ function HomeStack() {
           borderBottomWidth: 0,
         },
         headerTintColor: GlobalColors.titleText,
-        headerTitleStyle: {color: 'white'},
+        headerTitleStyle: {color: 'black'},
       }}>
       <Stack.Screen
         name="Home"
@@ -208,7 +208,7 @@ function AsqmStack() {
       <Stack.Screen
         name="AsqmAdd"
         component={AsqmAddScreen}
-        options={{title: 'Soru Ekle'}}
+        options={{title: 'Soru Sor'}}
       />
       <Stack.Screen
         name="AsqmThread"
@@ -248,7 +248,7 @@ function SettingsStack() {
       initialRouteName="Settings"
       screenOptions={{
         headerStyle: {backgroundColor: GlobalColors.headerBackground},
-        headerTintColor: '#fff',
+        headerTintColor: 'black',
         headerTitleStyle: {fontWeight: 'bold'},
       }}>
       <Stack.Screen
@@ -343,16 +343,6 @@ const ErrorContainer = ({tryagain}) => {
             alignSelf: 'center',
             alignItems: 'center',
           }}>
-          <View
-            style={{
-              backgroundColor: 'purple',
-              width: 72,
-              height: 72,
-              alignSelf: 'center',
-              marginBottom: 6,
-              borderRadius: 36,
-            }}></View>
-
           <Text style={{fontWeight: 'bold', fontSize: 16}}>
             Servise Bağlanılamadı
           </Text>

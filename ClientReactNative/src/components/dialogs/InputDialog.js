@@ -67,7 +67,10 @@ const InputDialog = ({visible, title, confirm, dismiss}) => {
 
             <View style={{flexDirection: 'row', marginTop: 12}}>
               <TouchableOpacity
-                onPress={() => dismiss()}
+                onPress={() => {
+                  dismiss();
+                  setCurrentValue(0);
+                }}
                 style={{
                   flex: 1,
                   justifyContent: 'center',
@@ -86,7 +89,7 @@ const InputDialog = ({visible, title, confirm, dismiss}) => {
               <TouchableOpacity
                 onPress={() => {
                   confirm(currentValue);
-                  //dismiss();
+                  setCurrentValue(0);
                 }}
                 style={{
                   flex: 1,
