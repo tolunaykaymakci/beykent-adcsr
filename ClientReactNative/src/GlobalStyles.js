@@ -18,7 +18,7 @@ export const GlobalColors = {
   seperator:
     currentAppTheme != 'dark' ? 'rgba(0,0,0,.15)' : 'rgba(255,255,255,.15)',
 
-  headerBackground: 'transparent',
+  headerBackground: 'white',
 
   accentColor: 'rgba(70,118,163,1)',
 };

@@ -1,9 +1,10 @@
-import React, {useState, useEffect, useLayoutEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
   SafeAreaView,
   StyleSheet,
+  Button,
   TouchableOpacity,
   Dimensions,
   SectionList,
@@ -20,50 +21,51 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import QuestionReportLesson from '../../src/components/QuestionReportLesson';
 
-import RDS from '../../screens/home/RecordDetailsScreen';
+import RDS from './RecordDetailsScreen';
 
 import {authorizedRequest, dump, getAuthToken} from '../../Service';
 import {useIsFocused} from '@react-navigation/native';
 
-const Item = ({title, nav}) => (
+const RecordItem = ({title, nav, subj, desc, time, action}) => (
   <TouchableOpacity
-    onPress={() =>
-      nav.navigate('RecordDetails', {
-        initMode: RDS.RECDM_QUESTION_REPORT_LESSON,
-      })
-    }
+    onPress={() => action()}
     style={{
       backgroundColor: '#fff',
       height: 64,
       flexDirection: 'row',
     }}>
     <MaterialCommunityIcons
-      style={{alignSelf: 'center'}}
+      style={{alignSelf: 'center', marginEnd: 8}}
       name="border-color"
       color={'rgb(171,180,190)'}
       size={24}
     />
 
     <View style={{alignSelf: 'center'}}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.title}>Ders Konusu</Text>
-      <Text style={styles.title}>
-        {126} soru, {6} test
-      </Text>
+      <Text style={{fontWeight: 'bold', fontSize: 14}}>{title}</Text>
+      <Text style={{fontSize: 13}}>{subj}</Text>
+      <Text style={{fontSize: 13}}>{desc}</Text>
     </View>
 
-    <View style={{position: 'absolute', right: 0, alignSelf: 'center'}}>
+    <View
+      style={{
+        position: 'absolute',
+        flexDirection: 'row',
+        right: 6,
+        alignSelf: 'center',
+      }}>
       <MaterialCommunityIcons
         name="border-color"
         color={'rgb(171,180,190)'}
-        size={24}
+        size={21}
       />
+      <Text style={{fontSize: 17}}>21:00</Text>
     </View>
   </TouchableOpacity>
 );
 
 function App({route, navigation}) {
-  const {planId, mode} = route.params;
+  const {planId, mode, type} = route.params;
   const [report, setReport] = useState();
   const [records, setRecords] = useState();
   const [recordList, setRecordList] = useState([]);
@@ -71,6 +73,8 @@ function App({route, navigation}) {
   const [programText, setProgramText] = useState();
   const [stateMode, setStateMode] = useState('daily');
   const [qan, setQan] = useState();
+  const [programPerc, setProgramPerc] = useState(20);
+
   const isFocused = useIsFocused();
 
   const momentDate = useRef(moment(Date.now()));
@@ -81,6 +85,11 @@ function App({route, navigation}) {
   const currentReport = useRef();
 
   useEffect(() => {
+    navigation.setOptions({
+      headerTitle:
+        type === 'questions' ? 'Soru Çözümlerim' : 'Konu Tekrarlarım',
+    });
+
     authorizedRequest('ss/sdb/plan', {plan_id: planId})
       .then((response) => response.json())
       .then((json) => {
@@ -103,9 +112,6 @@ function App({route, navigation}) {
       })
       .catch((error) => console.error(error))
       .finally(() => {});
-  }, []);
-
-  useEffect(() => {
     requestReport();
   }, [isFocused]);
 
@@ -113,10 +119,11 @@ function App({route, navigation}) {
     setShowFab(false);
     setReport(null);
     var repDateStr = momentDate.current.format('yyyy-MM-DD');
+    graphWebView.current.injectJavaScript("enableHighlights('" + type + "')");
     graphWebView.current.injectJavaScript(makeGraphRequestJs(repDateStr));
 
     /* Request questions report */
-    authorizedRequest('api/reports/questions', {
+    authorizedRequest('api/reports/' + type, {
       date: repDateStr,
       mode: currentMode.current,
       plan: planId,
@@ -127,12 +134,14 @@ function App({route, navigation}) {
         qAnalyse();
         setReport(json);
         setShowFab(true);
+
+        setProgramPerc(json.perc);
       })
       .catch((error) => console.error(error))
       .finally(() => {});
 
     /* Request questions records */
-    authorizedRequest('api/records/questions', {
+    authorizedRequest('api/records/' + type, {
       mode: 'range',
       plan: planId,
       start: repDateStr,
@@ -178,19 +187,25 @@ function App({route, navigation}) {
   };
 
   const makeGraphRequestJs = (date) => {
-    return `req('${getAuthToken()}', 'questions', '${
+    return `req('${getAuthToken()}', '${type}', '${
       currentMode.current
-    }', ${planId}, '${date}')`;
+    }', ${planId}, '${date}', '${global.cred}', '${global.pwd}')`;
   };
 
   const qAnalyse = () => {
     let r = currentReport.current;
 
-    let total = r.solved;
-    let correct = r.t_correct;
-    let wrong = r.t_wrong;
-    let empty = r.t_empty;
-    let other = r.t_other;
+    var total = r.solved;
+    var correct = r.t_correct;
+    var wrong = r.t_wrong;
+    var empty = r.t_empty;
+    var other = r.t_other;
+
+    total = 250;
+    correct = 50;
+    wrong = 30;
+    empty = 20;
+    other = 150;
 
     let percCorrect = (correct * 100) / total;
     let percWrong = (wrong * 100) / total;
@@ -205,13 +220,14 @@ function App({route, navigation}) {
     console.log(correct);
     console.log(wrong);
     console.log(empty);
+    console.log(other);
 
     setQan({
       tvc: tvc,
       tvw: tvw,
       tve: tve,
       tvo: tvo,
-      tqe: !(((correct == wrong) == empty) == 0),
+      tqe: !((((correct == wrong) == empty) == 0) == total),
     });
 
     console.log({
@@ -219,7 +235,7 @@ function App({route, navigation}) {
       tvw: tvw,
       tve: tve,
       tvo: tvo,
-      tqe: !(((correct == wrong) == empty) == 0),
+      tqe: !((((correct == wrong) == empty) == 0) == total),
     });
   };
 
@@ -233,62 +249,84 @@ function App({route, navigation}) {
             style={{
               backgroundColor: GlobalColors.headerSecondary,
               elevation: 4,
-              margin: 16,
             }}>
             <View
-              style={{
-                flexDirection: 'row',
-                alignSelf: 'center',
-                paddingTop: 6,
-              }}>
-              <Text
-                onPress={() => {
-                  if (currentMode.current !== 'daily') {
-                    momentDate.current = moment('2021-04-09');
-                    currentMode.current = 'daily';
-                    setStateMode('daily');
-                    requestReport();
-                  }
-                }}
-                style={
-                  stateMode === 'daily'
-                    ? styles.modeButtonActive
-                    : styles.modeButton
-                }>
-                Günlük
-              </Text>
-              <Text
-                onPress={() => {
-                  if (currentMode.current !== 'weekly') {
-                    momentDate.current = moment('2021-04-12');
-                    currentMode.current = 'weekly';
-                    setStateMode('weekly');
-                    requestReport();
-                  }
-                }}
-                style={
-                  stateMode === 'weekly'
-                    ? styles.modeButtonActive
-                    : styles.modeButton
-                }>
-                Haftalık
-              </Text>
-              <Text
-                onPress={() => {
-                  if (currentMode.current !== 'monthly') {
-                    momentDate.current = moment('2021-04-01');
-                    currentMode.current = 'monthly';
-                    setStateMode('monthly');
-                    requestReport();
-                  }
-                }}
-                style={
-                  stateMode === 'monthly'
-                    ? styles.modeButtonActive
-                    : styles.modeButton
-                }>
-                Aylık
-              </Text>
+              style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignSelf: 'flex-start',
+                  paddingTop: 6,
+                }}>
+                <Text
+                  onPress={() => {
+                    if (currentMode.current !== 'daily') {
+                      momentDate.current = moment('2021-04-09');
+                      currentMode.current = 'daily';
+                      setStateMode('daily');
+                      requestReport();
+                    }
+                  }}
+                  style={
+                    stateMode === 'daily'
+                      ? styles.modeButtonActive
+                      : styles.modeButton
+                  }>
+                  Günlük
+                </Text>
+                <Text
+                  onPress={() => {
+                    if (currentMode.current !== 'weekly') {
+                      momentDate.current = moment('2021-04-12');
+                      currentMode.current = 'weekly';
+                      setStateMode('weekly');
+                      requestReport();
+                    }
+                  }}
+                  style={
+                    stateMode === 'weekly'
+                      ? styles.modeButtonActive
+                      : styles.modeButton
+                  }>
+                  Haftalık
+                </Text>
+                <Text
+                  onPress={() => {
+                    if (currentMode.current !== 'monthly') {
+                      momentDate.current = moment('2021-04-01');
+                      currentMode.current = 'monthly';
+                      setStateMode('monthly');
+                      requestReport();
+                    }
+                  }}
+                  style={
+                    stateMode === 'monthly'
+                      ? styles.modeButtonActive
+                      : styles.modeButton
+                  }>
+                  Aylık
+                </Text>
+              </View>
+
+              <View style={{flexDirection: 'row'}}>
+                <TouchableOpacity style={{width: 36, justifyContent: 'center'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center'}}
+                    name="fast-rewind"
+                    color={'rgb(58,79,101)'}
+                    size={25}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{width: 36, justifyContent: 'center'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center'}}
+                    name="fast-forward"
+                    color={'rgb(58,79,101)'}
+                    size={25}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View
@@ -297,19 +335,6 @@ function App({route, navigation}) {
                 flexDirection: 'row',
                 marginTop: 12,
               }}>
-              <TouchableOpacity
-                style={{
-                  height: '100%',
-                  width: 36,
-                }}>
-                <MaterialCommunityIcons
-                  style={{alignSelf: 'center', marginTop: 60}}
-                  name="chevron-left"
-                  color={'rgb(58,79,101)'}
-                  size={25}
-                />
-              </TouchableOpacity>
-
               <WebView
                 ref={graphWebView}
                 style={{
@@ -327,19 +352,6 @@ function App({route, navigation}) {
                 showsHorizontalScrollIndicator={false}
                 scrollEnabled={false}
               />
-
-              <TouchableOpacity
-                style={{
-                  height: '100%',
-                  width: 36,
-                }}>
-                <MaterialCommunityIcons
-                  style={{alignSelf: 'center', marginTop: 60}}
-                  name="chevron-right"
-                  color={'rgb(58,79,101)'}
-                  size={25}
-                />
-              </TouchableOpacity>
             </View>
 
             <View
@@ -504,7 +516,7 @@ function App({route, navigation}) {
                   Derslere Dağılım
                 </Text>
 
-                <View
+                {/* <View
                   style={{
                     flexDirection: 'row',
                     marginTop: 11,
@@ -522,7 +534,7 @@ function App({route, navigation}) {
                     color={'rgb(58,79,101)'}
                     size={22}
                   />
-                </View>
+                </View> */}
 
                 {report.lessons.length === 0 ? (
                   <View
@@ -580,13 +592,24 @@ function App({route, navigation}) {
                       style={{
                         width: 120,
                         height: 90,
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      <Text>perc</Text>
+                      <Progress.Circle
+                        style={{marginLeft: -16}}
+                        progress={Number(programPerc / 100)}
+                        thickness={8}
+                        size={74}
+                        formatText={(progress) => Math.floor(programPerc) + '%'}
+                        showsText={true}
+                        textStyle={{fontSize: 16}}
+                      />
                     </View>
 
                     <View
                       style={{
                         flex: 1,
+                        marginLeft: 12,
                       }}>
                       <View
                         style={{
@@ -771,29 +794,30 @@ function App({route, navigation}) {
                   Gün Saatlerine Dağılımı
                 </Text>
 
-                {/* Records Graph */}
-                <View
-                  style={{
-                    height: 100,
-                    width: '100%',
-                    marginTop: 8,
-                  }}></View>
-
-                {/* Records List Display */}
-
                 {records == null ? (
                   <Text>Yükleniyor...</Text>
                 ) : (
                   records.map((record) => (
-                    <SectionList
-                      sections={recordList}
-                      keyExtractor={(item, index) => item + index}
-                      renderItem={({item}) => (
-                        <Item title={item} nav={navigation} />
-                      )}
-                      renderSectionHeader={({section: {title}}) => (
-                        <Text style={styles.header}>{title}</Text>
-                      )}
+                    <RecordItem
+                      title={record.lesson_name}
+                      subj={
+                        record.recs.length === 1
+                          ? record.recs[0].subject_name
+                          : record.recs.length + ' konu'
+                      }
+                      desc={
+                        record.total_solved +
+                        ' soru, ' +
+                        record.total_test +
+                        ' test'
+                      }
+                      nav={navigation}
+                      action={() => {
+                        navigation.navigate('ManQuestions', {
+                          initDate: momentDate.current.format('yyyy-MM-DD'),
+                          recordPack: record,
+                        });
+                      }}
                     />
                   ))
                 )}

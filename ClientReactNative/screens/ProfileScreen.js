@@ -1,7 +1,14 @@
-﻿import * as React from 'react';
+﻿import React, {useState, useEffect} from 'react';
 import {View, Text, SafeAreaView} from 'react-native';
+import {dump} from '../Service';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({route, navigation}) => {
+  const {username} = route.params;
+
+  useEffect(() => {
+    dump(username);
+  }, []);
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1, padding: 16}}>

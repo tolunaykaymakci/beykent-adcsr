@@ -26,6 +26,7 @@ const QuestionReportLesson = ({rlesson, nav}) => {
         marginBottom: 10,
       }}>
       <TouchableOpacity
+        disabled={true}
         onPress={() =>
           nav.navigate('ReportItemDetails', {
             initMode: RIDS.REPIDM_QUESTION_REPORT_LESSON,
@@ -101,7 +102,7 @@ const QuestionReportLesson = ({rlesson, nav}) => {
             <Text
               style={{
                 alignSelf: 'center',
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: 'bold',
               }}>
               {rlesson.solved}
@@ -118,12 +119,12 @@ const QuestionReportLesson = ({rlesson, nav}) => {
               SORU
             </Text>
 
-            <MaterialCommunityIcons
+            {/* <MaterialCommunityIcons
               style={{alignSelf: 'center'}}
               name="chevron-right"
               color={'rgb(58,79,101)'}
               size={22}
-            />
+            /> */}
           </View>
         </View>
       </TouchableOpacity>

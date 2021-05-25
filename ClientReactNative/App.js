@@ -30,8 +30,7 @@ import AsqmThreadScreen from './screens/AsqmThreadScreen';
 import AsqmAddScreen from './screens/AsqmAddScreen';
 import CommScreen from './screens/CommScreen';
 
-import QuestionsReportScreen from './screens/home/QuestionsReportScreen';
-import StudiesReportScreen from './screens/home/StudiesReportScreen';
+import ReportsScreen from './screens/home/ReportsScreen';
 
 import ManQuestionsScreen from './screens/home/ManQuestionsScreen';
 import ManStudyScreen from './screens/home/ManStudyScreen';
@@ -126,8 +125,8 @@ function HomeStack() {
         options={{title: 'Çalışma Planlarım'}}
       />
       <Stack.Screen
-        name="QuestionsReport"
-        component={QuestionsReportScreen}
+        name="Reports"
+        component={ReportsScreen}
         options={{title: 'Soru Çözümlerim'}}
       />
       <Stack.Screen
@@ -140,12 +139,6 @@ function HomeStack() {
         component={ManStudyScreen}
         options={{title: 'Konu Çalışması Ekle'}}
       />
-      <Stack.Screen
-        name="StudiesReport"
-        component={StudiesReportScreen}
-        options={{title: 'Çalışmalarım'}}
-      />
-
       <Stack.Screen
         name="Records"
         component={RecordsScreen}
@@ -176,6 +169,11 @@ function HomeStack() {
         name="Friends"
         component={FriendsScreen}
         options={{title: 'Arkadaşlarım'}}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{title: 'Profile Page'}}
       />
     </Stack.Navigator>
   );
@@ -214,6 +212,11 @@ function AsqmStack() {
         name="AsqmThread"
         component={AsqmThreadScreen}
         options={{title: 'Soru'}}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{title: 'Profile Page'}}
       />
     </Stack.Navigator>
   );

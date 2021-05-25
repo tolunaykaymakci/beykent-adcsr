@@ -66,12 +66,10 @@ const HomeSummaryScreen = ({nav}) => {
   const [loadingMain, setLoadingMain] = useState(true);
   const [loadingQReports, setLoadingQReports] = useState(true);
   const [loadingSReports, setLoadingSReports] = useState(true);
-  const [loadingTimers, setLoadingTimers] = useState(true);
 
   const [mainReport, setMainReport] = useState();
   const [qReportData, setQReportData] = useState();
   const [sReportData, setSReportData] = useState();
-  const [timersData, setTimersData] = useState();
 
   const [planExists, setPlanExists] = useState(false);
 
@@ -80,13 +78,15 @@ const HomeSummaryScreen = ({nav}) => {
   const momentDate = useRef(moment(Date.now()));
 
   const makeQGraphRequestJs = (date, pid) => {
-    return `req('${getAuthToken()}', 'questions', 'daily',
-     ${pid}, '${date}')`;
+    return `req('${getAuthToken()}', 'questions', 'daily', ${pid}, '${date}', '${
+      global.cred
+    }', '${global.pwd}')`;
   };
 
   const makeSGraphRequestJs = (date, pid) => {
-    return `req('${getAuthToken()}', 'studies', 'daily',
-     ${pid}, '${date}')`;
+    return `req('${getAuthToken()}', 'studies', 'daily', ${pid}, '${date}', '${
+      global.cred
+    }', '${global.pwd}')`;
   };
 
   useLayoutEffect(() => {
@@ -104,7 +104,7 @@ const HomeSummaryScreen = ({nav}) => {
   }, []);
 
   const requestSubModules = (planId) => {
-    momentDate.current = moment(new Date('2021-04-10'));
+    momentDate.current = moment();
     var repDateStr = momentDate.current.format('yyyy-MM-DD');
 
     authorizedRequest('api/app/home/ques', {})
@@ -128,15 +128,6 @@ const HomeSummaryScreen = ({nav}) => {
 
         setSReportData(json);
         setLoadingSReports(false);
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {});
-
-    authorizedRequest('api/app/home/timr', {})
-      .then((response) => response.json())
-      .then((json) => {
-        setTimersData(json);
-        setLoadingTimers(false);
       })
       .catch((error) => console.error(error))
       .finally(() => {});
@@ -273,8 +264,10 @@ const HomeSummaryScreen = ({nav}) => {
 
                 <TouchableOpacity
                   onPress={() =>
-                    nav.navigate('QuestionsReport', {
+                    nav.navigate('Reports', {
                       planId: mainReport.plan.plan_id,
+                      mode: 'daily',
+                      type: 'questions',
                     })
                   }
                   style={{
@@ -517,8 +510,10 @@ const HomeSummaryScreen = ({nav}) => {
                   }}>
                   <TouchableOpacity
                     onPress={() =>
-                      nav.navigate('StudiesReport', {
+                      nav.navigate('Reports', {
                         planId: mainReport.plan.plan_id,
+                        mode: 'daily',
+                        type: 'studies',
                       })
                     }
                     style={{
@@ -607,67 +602,6 @@ const HomeSummaryScreen = ({nav}) => {
                 </TouchableOpacity>
               </View>
             </>
-          )}
-
-          {/* User Timers */}
-          {loadingTimers ? (
-            <Progress.Circle
-              style={{
-                position: 'absolute',
-                margin: 12,
-                bottom: 0,
-              }}
-              thickness={40}
-              size={24}
-              indeterminate={true}
-            />
-          ) : (
-            <View>
-              <Text
-                style={{
-                  fontSize: 19,
-                  fontWeight: 'bold',
-                  marginStart: 16,
-                  marginTop: 6,
-                  marginBottom: 6,
-                  color: 'rgb(105, 105, 107)',
-                }}>
-                SAYAÇLARIM
-              </Text>
-
-              <FlatList
-                ItemSeparatorComponent={
-                  Platform.OS !== 'android' &&
-                  (({highlighted}) => (
-                    <View
-                      style={[style.separator, highlighted && {marginLeft: 0}]}
-                    />
-                  ))
-                }
-                style={{marginStart: 6, marginEnd: 6}}
-                data={timersData.timers}
-                numColumns={2}
-                renderItem={({item, index, separators}) => (
-                  <TouchableHighlight
-                    key={item.timer_id}
-                    style={{
-                      flex: 1,
-                      ...GlobalStyles.primaryCard,
-                      marginEnd: 6,
-                      marginStart: 6,
-                      backgroundColor: GlobalColors.windowBackground,
-                      height: 102,
-                    }}
-                    onPress={() => this._onPress(item)}
-                    onShowUnderlay={separators.highlight}
-                    onHideUnderlay={separators.unhighlight}>
-                    <View>
-                      <Text>{item.name}</Text>
-                    </View>
-                  </TouchableHighlight>
-                )}
-              />
-            </View>
           )}
         </ScrollView>
       )}

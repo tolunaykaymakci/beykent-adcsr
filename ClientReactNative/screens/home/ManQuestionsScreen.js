@@ -24,14 +24,14 @@ import ManTestSheet from '../../src/components/sheets/ManTestSheet';
 import {GlobalColors, GlobalStyles} from '../../src/GlobalStyles';
 
 import TouchChoose from '../../src/components/TouchChoose';
-import {authorizedRequest} from '../../Service';
+import {authorizedRequest, dump} from '../../Service';
 
 import {TestDataItem} from '../../src/components/ManDataItems';
 
 const width = Dimensions.get('window').width;
 
 const ManQuestionsScreen = ({route, navigation}) => {
-  const {initDate} = route.params;
+  const {initDate, recordPack} = route.params;
 
   const [requestingPlans, setRequestingPlans] = useState(true);
   const [planText, setPlanText] = useState();
@@ -58,6 +58,10 @@ const ManQuestionsScreen = ({route, navigation}) => {
   const [renderItems, setRenderItems] = useState([new TestDataItem(true)]);
 
   useLayoutEffect(() => {
+    if (recordPack) {
+      dump(recordPack);
+    }
+
     var initTime = moment().format('HH:mm:ss');
     currentDate.current = moment(initDate + ' ' + initTime);
     setDateText(currentDate.current.format('yyyy-MM-DD HH:mm:ss'));

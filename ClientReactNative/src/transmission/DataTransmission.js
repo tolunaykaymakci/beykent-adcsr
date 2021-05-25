@@ -1,4 +1,4 @@
-import {authorizedRequest, dump, getAuthToken} from '../../Service';
+import {authorizedRequest} from '../../Service';
 import {DataTransmissionRequest} from './DTRequest';
 
 const TransmissionSteps = {
@@ -7,7 +7,7 @@ const TransmissionSteps = {
   Completed: 2,
 };
 
-const DATA_PACKET_SIZE = 4096;
+const DATA_PACKET_SIZE = 8192;
 
 let DataTransmission = function () {
   this.dataBytes = [];
@@ -15,7 +15,6 @@ let DataTransmission = function () {
   this.entryPoint = '';
   this.currentDataIndex = 0;
   this.currentDataPosition = 0;
-  this.dataPacketSize = DATA_PACKET_SIZE;
 
   this.request = new DataTransmissionRequest();
 
@@ -116,11 +115,7 @@ let DataTransmission = function () {
       }
 
       var calculation = (currentBytes * 100) / totalBytes;
-      if (!isFinite(calculation)) {
-        calculation = 0;
-      }
-
-      this.progress(calculation);
+      this.progress(isFinite(calculation) ? calculation : 0);
     }
 
     request.di = this.currentDataIndex;

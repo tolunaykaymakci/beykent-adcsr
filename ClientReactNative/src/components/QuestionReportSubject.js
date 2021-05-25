@@ -21,6 +21,7 @@ const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
 
   return (
     <TouchableOpacity
+      disabled={true}
       onPress={() =>
         nav.navigate('ReportItemDetails', {
           initMode: RIDS.REPIDM_QUESTION_REPORT_SUBJECT,
@@ -88,7 +89,7 @@ const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
           <Text
             style={{
               alignSelf: 'center',
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: 'bold',
             }}>
             {rsubject.solved}
