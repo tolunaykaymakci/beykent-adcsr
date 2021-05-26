@@ -64,3 +64,16 @@ export const makeApiep = (ep) => {
   }
   return ep;
 };
+
+export const updateUserInfo = (callback) => {
+  authorizedRequest('api/account/info', {info_self: true})
+  .then((response) => response.json())
+  .then((json) => {
+    if (json.status && json.status == 401) {
+      return;
+    }
+
+    global.user = json;
+    callback();
+  });
+};

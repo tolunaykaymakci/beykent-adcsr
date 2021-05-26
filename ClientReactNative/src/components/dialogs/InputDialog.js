@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {GlobalStyles} from '../../GlobalStyles';
 
-const InputDialog = ({visible, title, confirm, dismiss}) => {
+const InputDialog = ({visible, title, confirm, dismiss, inputType}) => {
   const [currentValue, setCurrentValue] = useState(0);
 
   return (
@@ -42,17 +42,22 @@ const InputDialog = ({visible, title, confirm, dismiss}) => {
             </Text>
 
             <TextInput
-              keyboardType="numeric"
+              keyboardType={inputType ?? 'numeric'}
               autoFocus={true}
               onFocus={() => {
+                if (!inputType || inputType === 'numeric') {
                 if (currentValue == '0') {
                   setCurrentValue('');
                 }
+              }
               }}
-              onBlue={() => {
+              onBlur={() => {
+                
+                if (!inputType || inputType === 'numeric') {
                 if (currentValue == '') {
                   setCurrentValue('0');
                 }
+              }
               }}
               onChangeText={(text) => setCurrentValue(text)}
               style={{

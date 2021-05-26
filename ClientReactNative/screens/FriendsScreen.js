@@ -12,11 +12,13 @@ import {authorizedRequest} from '../Service';
 import {GlobalColors} from '../src/GlobalStyles';
 import {useIsFocused} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SearchUserDialog from '../src/components/dialogs/SearchUserDialog';
 
 function App({route, navigation}) {
   const [screenMode, setScreenMode] = useState('friends'); //friends, requests
   const [friends, setFriends] = useState();
   const [requests, setRequests] = useState();
+  const [searchVisible, setSearchVisible] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -309,7 +311,7 @@ function App({route, navigation}) {
           position: 'absolute',
         }}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('AsqmAdd', {})}
+          onPress={() => setSearchVisible(true)}
           style={{
             backgroundColor: 'rgba(52, 106, 172, 1)',
             width: 64,
@@ -323,12 +325,17 @@ function App({route, navigation}) {
           }}>
           <MaterialIcons
             style={{alignSelf: 'center', marginTop: 15}}
-            name="person-add"
+            name="person-search"
             color={'rgb(255,255,255)'}
             size={32}
           />
         </TouchableOpacity>
       </View>
+
+      <SearchUserDialog
+        visible={searchVisible}
+        dismiss={() => setSearchVisible(false)}
+      />
     </SafeAreaView>
   );
 }
