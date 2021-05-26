@@ -75,6 +75,9 @@ function App({route, navigation}) {
   const [qan, setQan] = useState();
   const [programPerc, setProgramPerc] = useState(20);
 
+  const [nextButtonVisible, setNextButtonVisible] = useState(false);
+  const [nextGroupButtonVisible, setNextGroupButtonVisible] = useState(false);
+
   const isFocused = useIsFocused();
 
   const momentDate = useRef(moment(Date.now()));
@@ -121,6 +124,8 @@ function App({route, navigation}) {
     var repDateStr = momentDate.current.format('yyyy-MM-DD');
     graphWebView.current.injectJavaScript("enableHighlights('" + type + "')");
     graphWebView.current.injectJavaScript(makeGraphRequestJs(repDateStr));
+
+    updateGraphControls();
 
     /* Request questions report */
     authorizedRequest('api/reports/' + type, {
@@ -177,13 +182,79 @@ function App({route, navigation}) {
   };
 
   const previousReportDate = () => {
-    momentDate.current = momentDate.current.subtract(1, 'd');
+    var mtype = stateMode === 'monthly' ? 'M' : stateMode[0];
+    momentDate.current = momentDate.current.subtract(1, mtype);
     requestReport();
   };
 
   const nextReportDate = () => {
-    momentDate.current = momentDate.current.add(1, 'd');
+    var mtype = stateMode === 'monthly' ? 'M' : stateMode[0];
+    momentDate.current = momentDate.current.add(1, mtype);
     requestReport();
+  };
+
+  const previousReportDateGroup = () => {
+    var mtype = stateMode === 'monthly' ? 'M' : stateMode[0];
+    var amount = stateMode === 'daily' ? 7 : 5;
+    momentDate.current = momentDate.current.subtract(amount, mtype);
+    requestReport();
+  };
+
+  const nextReportDateGroup = () => {
+    var mtype = stateMode === 'monthly' ? 'M' : stateMode[0];
+    var amount = stateMode === 'daily' ? 7 : 5;
+    momentDate.current = momentDate.current.add(amount, mtype);
+    requestReport();
+  };
+
+  const updateGraphControls = () => {
+    let now = moment();
+    let dd = momentDate.current.date(),
+      dm = momentDate.current.month(),
+      dy = momentDate.current.year(),
+      nd = now.date(),
+      nm = now.month(),
+      ny = now.year();
+
+    let testCal = momentDate.current.clone();
+    var groupEnabled = true;
+    var nextEnabled;
+    var i;
+
+    if (stateMode === 'daily') {
+      nextEnabled = dd === nd && dm === nm && dy === ny ? false : true;
+
+      for (i = 0; i !== 7; i++) {
+        if (dd === nd && dm === nm && dy === ny) {
+          groupEnabled = false;
+          break;
+        }
+        testCal.add(1, 'd');
+      }
+    } else if (stateMode === 'weekly') {
+      nextEnabled = dd === wdl && dm === ml && dy === yl ? false : true;
+
+      for (i = 0; i !== 5; i++) {
+        if (dd === wdl && dm === ml && dy === yl) {
+          groupEnabled = false;
+          break;
+        }
+        testCal.add(1, 'w');
+      }
+    } else if (stateMode === 'monthly') {
+      nextEnabled = dm === ml && dy === yl ? false : true;
+
+      for (i = 0; i !== 5; i++) {
+        if (dm === ml && dy === yl) {
+          groupEnabled = false;
+          break;
+        }
+        testCal.add(1, 'M');
+      }
+    }
+
+    setNextButtonVisible(nextEnabled);
+    setNextGroupButtonVisible(groupEnabled);
   };
 
   const makeGraphRequestJs = (date) => {
@@ -309,16 +380,22 @@ function App({route, navigation}) {
               </View>
 
               <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity style={{width: 36, justifyContent: 'center'}}>
-                  <MaterialIcons
-                    style={{alignSelf: 'center'}}
-                    name="fast-rewind"
-                    color={'rgb(58,79,101)'}
-                    size={25}
-                  />
-                </TouchableOpacity>
+                {nextGroupButtonVisible && (
+                  <TouchableOpacity
+                    onPress={() => nextReportDateGroup()}
+                    style={{width: 36, justifyContent: 'center'}}>
+                    <MaterialIcons
+                      style={{alignSelf: 'center'}}
+                      name="fast-rewind"
+                      color={'rgb(58,79,101)'}
+                      size={25}
+                    />
+                  </TouchableOpacity>
+                )}
 
-                <TouchableOpacity style={{width: 36, justifyContent: 'center'}}>
+                <TouchableOpacity
+                  onPress={() => previousReportDateGroup()}
+                  style={{width: 36, justifyContent: 'center'}}>
                   <MaterialIcons
                     style={{alignSelf: 'center'}}
                     name="fast-forward"
@@ -365,19 +442,21 @@ function App({route, navigation}) {
                 </Text>
               </View>
 
-              <TouchableOpacity
-                onPress={() => nextReportDate()}
-                style={{
-                  height: 40,
-                  width: 42,
-                }}>
-                <MaterialCommunityIcons
-                  style={{alignSelf: 'center', marginTop: 6}}
-                  name="chevron-left"
-                  color={'rgb(58,79,101)'}
-                  size={25}
-                />
-              </TouchableOpacity>
+              {nextButtonVisible && (
+                <TouchableOpacity
+                  onPress={() => nextReportDate()}
+                  style={{
+                    height: 40,
+                    width: 42,
+                  }}>
+                  <MaterialCommunityIcons
+                    style={{alignSelf: 'center', marginTop: 6}}
+                    name="chevron-left"
+                    color={'rgb(58,79,101)'}
+                    size={25}
+                  />
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 onPress={() => previousReportDate()}

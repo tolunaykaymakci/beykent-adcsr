@@ -135,7 +135,9 @@ const SettingsScreen = ({route, navigation}) => {
               />
               <View style={{alignSelf: 'center'}}>
                 <Text>Email Adresim</Text>
-                <Text style={{fontWeight: 'bold', fontSize: 13}}></Text>
+                <Text style={{fontWeight: 'bold', fontSize: 13}}>
+                  {global.user.user_mail}
+                </Text>
               </View>
             </View>
             <MaterialIcons

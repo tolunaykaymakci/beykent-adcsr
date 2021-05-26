@@ -11,6 +11,7 @@ import {
 import {authorizedRequest} from '../Service';
 import {GlobalColors} from '../src/GlobalStyles';
 import {useIsFocused} from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 function App({route, navigation}) {
   const [screenMode, setScreenMode] = useState('friends'); //friends, requests
@@ -68,7 +69,7 @@ function App({route, navigation}) {
   return (
     <SafeAreaView
       style={{flex: 1, backgroundColor: GlobalColors.windowBackground}}>
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', marginBottom: 4}}>
         <TouchableOpacity
           onPress={() => getFriends()}
           style={{
@@ -117,7 +118,7 @@ function App({route, navigation}) {
                       <TouchableOpacity
                         onPress={() => {
                           navigation.navigate('Profile', {
-                            username: 'emine',
+                            username: f.username,
                           });
                         }}
                         style={{
@@ -125,13 +126,15 @@ function App({route, navigation}) {
                           elevation: 4,
                           justifyContent: 'space-between',
                           borderRadius: 12,
+                          marginStart: 12,
+                          marginEnd: 12,
                           height: 64,
                           flexDirection: 'row',
                         }}>
                         <View style={{flexDirection: 'row'}}>
                           <View
                             style={{
-                              borderRadius: 20,
+                              borderRadius: 18,
                               overflow: 'hidden',
                               alignSelf: 'center',
                               marginStart: 12,
@@ -143,8 +146,8 @@ function App({route, navigation}) {
                                   : require('../assets/profile_default.png')
                               }
                               style={{
-                                width: 40,
-                                height: 40,
+                                width: 36,
+                                height: 36,
                               }}
                               resizeMode="contain"
                             />
@@ -170,15 +173,12 @@ function App({route, navigation}) {
                           </View>
                         </View>
 
-                        <View>
-                          <Button
-                            title="Soru Rapor"
-                            onPress={() => alert('lets goooo!')}></Button>
-
-                          <Button
-                            title="Konu Rapor"
-                            onPress={() => alert('lets goooo!')}></Button>
-                        </View>
+                        <MaterialIcons
+                          style={{alignSelf: 'center', marginEnd: 12}}
+                          name="person-add"
+                          color={'rgb(0,0,0)'}
+                          size={28}
+                        />
                       </TouchableOpacity>
                     ))}
                   </>
@@ -205,7 +205,7 @@ function App({route, navigation}) {
                           maxWidth: '80%',
                           textAlign: 'center',
                         }}>
-                        ...
+                        Arkadaşlarını ekleyin ve birlikte çalışmaya başlayın
                       </Text>
                     </View>
                   </>
@@ -256,11 +256,15 @@ function App({route, navigation}) {
 
                         <Button
                           title="Kabul Et"
-                          onPress={() => alert('Kabul ediliyor...')}></Button>
+                          onPress={() =>
+                            acceptFriendRequest(f.user_id)
+                          }></Button>
 
                         <Button
                           title="Reddet"
-                          onPress={() => alert('Kabul ediliyor...')}></Button>
+                          onPress={() =>
+                            dismissFriendRequest(f.user_id)
+                          }></Button>
                       </View>
                     ))}
                   </>
@@ -287,7 +291,7 @@ function App({route, navigation}) {
                           maxWidth: '80%',
                           textAlign: 'center',
                         }}>
-                        ...
+                        Henüz size bir arkadaşlık isteği gelmemiş
                       </Text>
                     </View>
                   </>
@@ -297,6 +301,34 @@ function App({route, navigation}) {
           </View>
         )}
       </ScrollView>
+
+      <View
+        style={{
+          bottom: 0,
+          right: 0,
+          position: 'absolute',
+        }}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('AsqmAdd', {})}
+          style={{
+            backgroundColor: 'rgba(52, 106, 172, 1)',
+            width: 64,
+            borderRadius: 32,
+            height: 64,
+            shadowOpacity: 0.43,
+            shadowRadius: 2.62,
+            elevation: 1,
+            alignItems: 'center',
+            margin: 16,
+          }}>
+          <MaterialIcons
+            style={{alignSelf: 'center', marginTop: 15}}
+            name="person-add"
+            color={'rgb(255,255,255)'}
+            size={32}
+          />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }

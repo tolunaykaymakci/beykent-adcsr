@@ -4,12 +4,12 @@ import {
   Text,
   SafeAreaView,
   Modal,
-  Pressable,
+  Alert,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   Button,
+  TextInput,
   Image,
 } from 'react-native';
 
@@ -18,7 +18,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import {getRequest} from '../Service';
+import {dump, getRequest} from '../Service';
 
 const PostAnswerSheet = ({refs, answerPost}) => {
   const [body, setBody] = useState('');
@@ -205,10 +205,51 @@ const PostAnswerSheet = ({refs, answerPost}) => {
   );
 };
 
-const AsqmContainer = ({post, type}) => {
+const AsqmContainer = ({post, type, navigation}) => {
+  const [body, setBody] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImage, setModalImage] = useState(null);
   const [replyVisible, setReplyVisible] = useState(false);
+
+  const deleteMyPost = () => {
+    Alert.alert(
+      type === 'question' ? 'Sorumu Sil' : 'Çözümümü Sil',
+      type === 'question'
+        ? 'Sorunuzu silmek istediğinizden emin misiniz?'
+        : 'Çözümünüzü silmek istediğinizden emin misiniz?',
+      [
+        {
+          text: 'Vazgeç',
+          style: 'cancel',
+        },
+        {
+          text: 'Evet',
+          onPress: () => {
+            alert('siliyorum o zaman cnm');
+          },
+        },
+      ],
+    );
+  };
+
+  const deleteMyReply = (pid) => {
+    Alert.alert('Yanıtımı Sil', null, [
+      {
+        text: 'Vazgeç',
+        style: 'cancel',
+      },
+      {
+        text: 'Evet',
+        onPress: () => {
+          alert('siliyorum o zaman yanıtımı cnm');
+        },
+      },
+    ]);
+  };
+
+  const reportThisPost = (pid, check) => {
+    alert('reportlamacaklar');
+  };
 
   return (
     <View
@@ -219,7 +260,7 @@ const AsqmContainer = ({post, type}) => {
           marginEnd: 0,
           marginTop: 1,
           borderRadius: 0,
-          elevation: 1,
+          elevation: 1.5,
           backgroundColor: 'white',
         },
       ]}>
@@ -262,22 +303,53 @@ const AsqmContainer = ({post, type}) => {
 
       {/* --- */}
 
-      <View style={styles.userbar}>
-        <Image
-          style={{
-            height: 34,
-            width: 34,
-            borderRadius: 34 / 2,
-            alignSelf: 'center',
-            marginStart: 12,
+      <View style={{...styles.userbar}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('Profile', {
+              username: post.poster,
+            });
           }}
-          source={{uri: post.poster_pic}}
-        />
+          style={{
+            flexDirection: 'row',
+            width: '80%',
+          }}>
+          <Image
+            style={{
+              height: 34,
+              width: 34,
+              borderRadius: 34 / 2,
+              alignSelf: 'center',
+              marginStart: 12,
+            }}
+            source={{uri: post.poster_pic}}
+          />
 
-        <View style={{flexDirection: 'column', marginStart: 9}}>
-          <Text>{type === 'question' ? 'Soran' : 'Çözen'}</Text>
-          <Text style={{fontWeight: 'bold'}}>@{post.poster}</Text>
-        </View>
+          <View style={{flexDirection: 'column', marginStart: 9}}>
+            <Text>{type === 'question' ? 'Soran' : 'Çözen'}</Text>
+            <Text style={{fontWeight: 'bold'}}>@{post.poster}</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            if (global.user.username === post.poster) deleteMyPost();
+            else reportThisPost(post.id, true);
+          }}
+          style={{
+            position: 'absolute',
+            right: 9,
+            top: 6,
+            borderRadius: 20,
+            padding: 8,
+            backgroundColor: 'rgb(234, 234, 234)',
+          }}>
+          <MaterialIcons
+            name={global.user.username === post.poster ? 'delete' : 'warning'}
+            color={'black'}
+            size={23}
+          />
+        </TouchableOpacity>
       </View>
 
       <View style={{margin: 8, marginBottom: 4}}>
@@ -359,6 +431,22 @@ const AsqmContainer = ({post, type}) => {
                       Merhabalar bu bir yanıttır Merhabalar bu bir yanıttır
                       Merhabalar bu bir yanıttır
                     </Text>
+
+                    <MaterialIcons
+                      onPress={() => {
+                        if (global.user.username === post.poster)
+                          deleteMyReply(replyPost.id);
+                        else reportThisPost(replyPost.id, true);
+                      }}
+                      style={{position: 'absolute', right: 0}}
+                      name={
+                        global.user.username === post.poster
+                          ? 'delete'
+                          : 'warning'
+                      }
+                      color={'black'}
+                      size={18}
+                    />
                   </View>
                 </View>
               );
@@ -368,12 +456,22 @@ const AsqmContainer = ({post, type}) => {
 
         {replyVisible ? (
           <>
-            <View
+            <TextInput
               style={{
-                height: 150,
-                marginStart: '20%',
-                backgroundColor: 'blue',
-              }}></View>
+                ...styles.input,
+                backgroundColor: 'white',
+                marginStart: 64,
+                marginTop: 8,
+                marginEnd: 8,
+              }}
+              onChangeText={setBody}
+              value={body}
+              maxLength={2000}
+              textAlignVertical="top"
+              multiline={true}
+              placeholderTextColor="rgb(90,90,90)"
+              placeholder="Yanıtınızı girin"
+            />
             <View
               style={{flexDirection: 'row', justifyContent: 'space-around'}}>
               <Text onPress={() => setReplyVisible(false)}>Vazgeç</Text>
@@ -439,15 +537,18 @@ const AsqmThreadScreen = ({route, navigation}) => {
           <ScrollView>
             {thread.solved && (
               <View style={{padding: 12, flex: 1, backgroundColor: '#6AA364'}}>
-                <Text
-                  style={{fontWeight: 'bold', color: 'white', fontSize: 17}}>
+                <Text style={{color: 'white', fontSize: 17}}>
                   SORU ÇÖZÜLDÜ!
                 </Text>
               </View>
             )}
 
             {/* Poster Card */}
-            <AsqmContainer post={thread} type="question" />
+            <AsqmContainer
+              post={thread}
+              type="question"
+              navigation={navigation}
+            />
 
             {thread.answers && thread.answers.length > 0 ? (
               <View>
@@ -455,7 +556,7 @@ const AsqmThreadScreen = ({route, navigation}) => {
                   style={{
                     fontWeight: 'bold',
                     marginStart: 12,
-                    marginTop: 12,
+                    marginTop: 20,
                     marginBottom: 12,
                     marginEnd: 12,
                   }}>
