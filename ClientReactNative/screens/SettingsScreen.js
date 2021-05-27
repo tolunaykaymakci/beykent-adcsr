@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   Text,
+  Button,
   Image,
   ScrollView,
   SafeAreaView,
@@ -14,106 +15,93 @@ import {AsyncStorage} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {authorizedRequest, dump, updateUserInfo} from '../Service';
 
+import InputDialog from '../src/components/dialogs/InputDialog';
+import RBSheet from 'react-native-raw-bottom-sheet';
+
 // we need to re-request user data after any changes on this page
 
 const CanSendFRSheet = ({refs, selected}) => {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#000',
+    <RBSheet
+      ref={refs}
+      closeOnDragDown={true}
+      closeOnPressMask={true}
+      customStyles={{
+        wrapper: {
+          backgroundColor: 'rgba(0,0,0,.3)',
+        },
+        draggableIcon: {
+          backgroundColor: '#000',
+        },
+        container: {
+          backgroundColor: '#fff',
+        },
       }}>
-      <RBSheet
-        ref={refs}
-        closeOnDragDown={true}
-        closeOnPressMask={true}
-        customStyles={{
-          wrapper: {
-            backgroundColor: 'rgba(0,0,0,.3)',
-          },
-          draggableIcon: {
-            backgroundColor: '#000',
-          },
-          container: {
-            backgroundColor: '#fff',
-          },
-        }}>
-        <Text style={{padding: 12, fontSize: 16}}>
-          Arkadaşlık İsteği Gönderilebilsin
-        </Text>
+      <Text style={{padding: 12, fontSize: 16}}>
+        Arkadaşlık İsteği Gönderilebilsin
+      </Text>
 
-        <TouchableOpacity
-          style={{padding: 12, paddingBottom: 6}}
-          onPress={() => selected('true')}>
-          <Text style={{fontWeight: 'bold', fontSize: 16}}>Evet</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={{padding: 12, paddingBottom: 6}}
+        onPress={() => selected('true')}>
+        <Text style={{fontWeight: 'bold', fontSize: 16}}>Evet</Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{padding: 12, paddingBottom: 6}}
-          onPress={() => selected('false')}>
-          <Text style={{fontWeight: 'bold', fontSize: 16}}>Hayır</Text>
-        </TouchableOpacity>
-      </RBSheet>
-    </View>
+      <TouchableOpacity
+        style={{padding: 12, paddingBottom: 6}}
+        onPress={() => selected('false')}>
+        <Text style={{fontWeight: 'bold', fontSize: 16}}>Hayır</Text>
+      </TouchableOpacity>
+    </RBSheet>
   );
 };
 
 const ReportsAccessSheet = ({refs, selected}) => {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#000',
+    <RBSheet
+      ref={refs}
+      closeOnDragDown={true}
+      closeOnPressMask={true}
+      customStyles={{
+        wrapper: {
+          backgroundColor: 'rgba(0,0,0,.3)',
+        },
+        draggableIcon: {
+          backgroundColor: '#000',
+        },
+        container: {
+          backgroundColor: '#fff',
+        },
       }}>
-      <RBSheet
-        ref={refs}
-        closeOnDragDown={true}
-        closeOnPressMask={true}
-        customStyles={{
-          wrapper: {
-            backgroundColor: 'rgba(0,0,0,.3)',
-          },
-          draggableIcon: {
-            backgroundColor: '#000',
-          },
-          container: {
-            backgroundColor: '#fff',
-          },
-        }}>
-        <Text style={{padding: 12, fontSize: 16}}>
-          Çalışma Raporlarımı Görebilenler
+      <Text style={{padding: 12, fontSize: 16}}>
+        Çalışma Raporlarımı Görebilenler
+      </Text>
+
+      <TouchableOpacity
+        style={{padding: 12, paddingBottom: 6}}
+        onPress={() => selected('OnlyMe')}>
+        <Text style={{fontWeight: 'bold', fontSize: 16}}>Sadece Ben</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{padding: 12, paddingBottom: 6}}
+        onPress={() => selected('OnlyFriends')}>
+        <Text style={{fontWeight: 'bold', fontSize: 16}}>
+          Sadece Arkadaşlarım
         </Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{padding: 12, paddingBottom: 6}}
-          onPress={() => selected('OnlyMe')}>
-          <Text style={{fontWeight: 'bold', fontSize: 16}}>Sadece Ben</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{padding: 12, paddingBottom: 6}}
-          onPress={() => selected('OnlyFriends')}>
-          <Text style={{fontWeight: 'bold', fontSize: 16}}>
-            Sadece Arkadaşlarım
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{padding: 12, paddingBottom: 6}}
-          onPress={() => selected('Everyone')}>
-          <Text style={{fontWeight: 'bold', fontSize: 16}}>Herkes</Text>
-        </TouchableOpacity>
-      </RBSheet>
-    </View>
+      <TouchableOpacity
+        style={{padding: 12, paddingBottom: 6}}
+        onPress={() => selected('Everyone')}>
+        <Text style={{fontWeight: 'bold', fontSize: 16}}>Herkes</Text>
+      </TouchableOpacity>
+    </RBSheet>
   );
 };
 
 const SettingsScreen = ({route, navigation}) => {
-  const [key, setKey] = useState(new Date().getTime());
+  const [key, setKey] = useState(new Date());
   const [unChangeVisible, setUnChangeVisible] = useState(false);
   const [dnChangeVisible, setDnChangeVisible] = useState(false);
   const [emChangeVisible, setEmChangeVisible] = useState(false);
@@ -138,16 +126,16 @@ const SettingsScreen = ({route, navigation}) => {
   };
 
   const setSetting = (s_key, s_val, s_type) => {
+    console.log(s_key, s_val, s_type);
+
     authorizedRequest('ss/a/settings/set', {s_key, s_val, s_type})
-      .then((response) => response.json())
-      .then((json) => {
+      .then((response) => {
         updateUserInfo(() => {
           // reload here
           setKey(new Date().getTime());
         });
       })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .catch((error) => console.error(error));
   };
 
   const changeName = (which, newValue) => {
@@ -201,7 +189,7 @@ const SettingsScreen = ({route, navigation}) => {
               <Image
                 source={
                   global.user.p_img != null
-                    ? {uri: 'https://reactnative.dev/img/tiny_logo.png'}
+                    ? {uri: global.user.p_img}
                     : require('../assets/profile_default.png')
                 }
                 style={{
@@ -222,6 +210,15 @@ const SettingsScreen = ({route, navigation}) => {
               }}>
               @{global.user.username}
             </Text>
+
+            <Button
+              title="Refresh"
+              onPress={() => {
+                updateUserInfo(() => {
+                  // reload here
+                  setKey(new Date().getTime());
+                });
+              }}></Button>
 
             <TouchableOpacity style={styles.actionButton}>
               <View style={{flexDirection: 'row', marginStart: 12}}>
@@ -454,19 +451,22 @@ const SettingsScreen = ({route, navigation}) => {
       <CanSendFRSheet
         refs={frSheet}
         selected={(val) => {
-          setSetting('fri_req_cb_sent', val, 'bool');
+          frSheet.current.close();
+          setSetting('FriendRequestsCanBeSent', val, 'bool');
         }}
       />
 
       <ReportsAccessSheet
         refs={accessSheet}
         selected={(val) => {
-          setSetting('st_det_rep_acc', val, 'string');
+          accessSheet.current.close();
+          setSetting('StudyDetailedReportAccesibleBy', val, 'string');
         }}
       />
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
     backgroundColor: 'white',
     height: 54,
-    elevation: 2,
+    elevation: 0.5,
   },
 });
 export default SettingsScreen;

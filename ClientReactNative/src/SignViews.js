@@ -174,7 +174,7 @@ export const CreateAccountView = ({reload}) => {
 };
 
 export const ResetPwdView = () => {
-  return <Text>You forgot biç!</Text>;
+  return <Text>Forgot some posswords my man!</Text>;
 };
 
 const styles = StyleSheet.create({

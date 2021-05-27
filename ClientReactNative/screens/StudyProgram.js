@@ -209,7 +209,7 @@ const StudyProgram = ({route, navigation}) => {
             target: rep.value,
           });
       });
-      program.lessons = lessons;
+      program = {lessons};
     } else if (currentType.current === 'weekly') {
       var days = [];
 
@@ -322,7 +322,7 @@ const StudyProgram = ({route, navigation}) => {
                     paddingStart: 9,
                   }}
                   name="save"
-                  color={'white'}
+                  color={'black'}
                   size={26}
                 />
               </TouchableOpacity>

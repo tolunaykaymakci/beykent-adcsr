@@ -333,6 +333,7 @@ function App({route, navigation}) {
       </View>
 
       <SearchUserDialog
+        navigation={navigation}
         visible={searchVisible}
         dismiss={() => setSearchVisible(false)}
       />

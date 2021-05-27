@@ -135,6 +135,7 @@ const ProfileScreen = ({route, navigation}) => {
               }}>
               <View
                 style={{
+                  marginTop: 12,
                   borderRadius: 25,
                   overflow: 'hidden',
                   alignSelf: 'center',
@@ -142,11 +143,10 @@ const ProfileScreen = ({route, navigation}) => {
                 <Image
                   source={
                     userInfo.p_url != null
-                      ? {uri: 'https://reactnative.dev/img/tiny_logo.png'}
+                      ? {uri: userInfo.p_url}
                       : require('../assets/profile_default.png')
                   }
                   style={{
-                    marginTop: 12,
                     width: 50,
                     height: 50,
                   }}

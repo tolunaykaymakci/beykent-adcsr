@@ -4,24 +4,26 @@ import {
   View,
   Modal,
   Pressable,
+  ScrollView,
   Text,
   Image,
   TouchableOpacity,
   TextInput,
 } from 'react-native';
 
-import {getRequest} from '../../../Service';
+import {dump, getRequest} from '../../../Service';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {GlobalStyles} from '../../GlobalStyles';
+import {GlobalColors, GlobalStyles} from '../../GlobalStyles';
 
-const SearchUserDialog = (navigation, dismiss) => {
+const SearchUserDialog = ({navigation, visible, dismiss}) => {
   const [currentValue, setCurrentValue] = useState('');
   const [result, setResult] = useState();
 
-  const searchOnService = () => {
-    getRequest('ss/sdb/search', {pattern: currentValue, adcsr: true})
+  const searchOnService = (text) => {
+    getRequest('ss/a/search?adcsr=true&pattern=' + text)
       .then((response) => response.json())
       .then((json) => {
+        dump(json);
         setResult(json.users);
       })
       .catch((error) => console.error(error));
@@ -50,17 +52,19 @@ const SearchUserDialog = (navigation, dismiss) => {
               padding: 16,
               width: '80%',
               paddingBottom: 10,
+              height: 340,
             }}>
             <Text style={{fontWeight: 'bold', fontSize: 19, marginBottom: 12}}>
-              {title == null ? 'Kullanıcı Ara' : title}
+              Kullanıcı Ara
             </Text>
 
             <TextInput
               keyboardType="text"
               autoFocus={true}
+              autoCapitalize="none"
               onChangeText={(text) => {
                 setCurrentValue(text);
-                searchOnService();
+                searchOnService(text);
               }}
               style={{
                 fontSize: 22,
@@ -73,25 +77,25 @@ const SearchUserDialog = (navigation, dismiss) => {
             </TextInput>
 
             {!result ? (
-              <Text style={{textAlign: 'center'}}>En az üç karakter girin</Text>
+              <Text style={{textAlign: 'center', marginTop: 16}}>
+                En az üç karakter girin
+              </Text>
             ) : (
               <View>
                 {result.length > 0 ? (
                   <ScrollView>
-                    {result.map(() => (
+                    {result.map((f) => (
                       <TouchableOpacity
                         onPress={() => {
+                          dismiss();
                           navigation.navigate('Profile', {
                             username: f.username,
                           });
                         }}
                         style={{
                           backgroundColor: GlobalColors.primaryCard,
-                          elevation: 4,
                           justifyContent: 'space-between',
                           borderRadius: 12,
-                          marginStart: 12,
-                          marginEnd: 12,
                           height: 64,
                           flexDirection: 'row',
                         }}>
@@ -101,20 +105,22 @@ const SearchUserDialog = (navigation, dismiss) => {
                               borderRadius: 18,
                               overflow: 'hidden',
                               alignSelf: 'center',
-                              marginStart: 12,
+                              marginStart: 6,
                             }}>
-                            <Image
-                              source={
-                                f.pic
-                                  ? {uri: f.pic}
-                                  : require('../assets/profile_default.png')
-                              }
-                              style={{
-                                width: 36,
-                                height: 36,
-                              }}
-                              resizeMode="contain"
-                            />
+                            {
+                              <Image
+                                source={
+                                  f.pic
+                                    ? {uri: f.pic}
+                                    : require('../../../assets/profile_default.png')
+                                }
+                                style={{
+                                  width: 36,
+                                  height: 36,
+                                }}
+                                resizeMode="contain"
+                              />
+                            }
                           </View>
 
                           <View style={{alignSelf: 'center', marginStart: 8}}>
@@ -125,7 +131,7 @@ const SearchUserDialog = (navigation, dismiss) => {
                         </View>
 
                         <MaterialIcons
-                          style={{alignSelf: 'center', marginEnd: 12}}
+                          style={{alignSelf: 'center', marginEnd: 6}}
                           name="person-add"
                           color={'rgb(0,0,0)'}
                           size={28}
@@ -134,7 +140,9 @@ const SearchUserDialog = (navigation, dismiss) => {
                     ))}
                   </ScrollView>
                 ) : (
-                  <Text style={{textAlign: 'center'}}>Sonuç Bulunamadı</Text>
+                  <Text style={{textAlign: 'center', marginTop: 16}}>
+                    Sonuç Bulunamadı
+                  </Text>
                 )}
               </View>
             )}
