@@ -130,6 +130,8 @@ function App({route, navigation}) {
                           borderRadius: 12,
                           marginStart: 12,
                           marginEnd: 12,
+                          marginTop: 3,
+                          marginBottom: 3,
                           height: 64,
                           flexDirection: 'row',
                         }}>
@@ -226,47 +228,91 @@ function App({route, navigation}) {
                         style={{
                           backgroundColor: GlobalColors.primaryCard,
                           elevation: 4,
+                          justifyContent: 'space-between',
                           borderRadius: 12,
+                          marginStart: 12,
+                          marginEnd: 12,
+                          marginTop: 3,
+                          marginBottom: 3,
                           height: 64,
                           flexDirection: 'row',
                         }}>
-                        <View
-                          style={{
-                            borderRadius: 35,
-                            overflow: 'hidden',
-                            alignSelf: 'center',
-                            marginStart: 12,
-                          }}>
-                          <Image
-                            source={
-                              f.pic
-                                ? {uri: f.pic}
-                                : require('../assets/profile_default.png')
-                            }
-                            style={{
-                              width: 70,
-                              height: 70,
+                        <View style={{flexDirection: 'row'}}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              navigation.navigate('Profile', {
+                                username: f.username,
+                              });
                             }}
-                            resizeMode="contain"
-                          />
+                            style={{
+                              borderRadius: 18,
+                              overflow: 'hidden',
+                              alignSelf: 'center',
+                              marginStart: 12,
+                            }}>
+                            <Image
+                              source={
+                                f.pic
+                                  ? {uri: f.pic}
+                                  : require('../assets/profile_default.png')
+                              }
+                              style={{
+                                width: 36,
+                                height: 36,
+                              }}
+                              resizeMode="contain"
+                            />
+                          </TouchableOpacity>
+
+                          <View style={{alignSelf: 'center', marginStart: 10}}>
+                            <Text style={{fontWeight: 'bold'}}>
+                              @{f.username}
+                            </Text>
+                            <Text style={{fontSize: 14}}>{f.r_fdate}</Text>
+                          </View>
                         </View>
 
-                        <View style={{alignSelf: 'center'}}>
-                          <Text>@{f.username}</Text>
-                          <Text>{f.r_fdate}</Text>
+                        <View style={{flexDirection: 'row'}}>
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: 'green',
+                              height: 42,
+                              width: 42,
+                              borderRadius: 21,
+                              marginEnd: 6,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              alignSelf: 'center',
+                            }}
+                            onPress={() => acceptFriendRequest(f.user_id)}>
+                            <MaterialIcons
+                              style={{alignSelf: 'center'}}
+                              name="check"
+                              color={'rgb(255,255,255)'}
+                              size={24}
+                            />
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: 'crimson',
+                              height: 42,
+                              width: 42,
+                              borderRadius: 21,
+                              marginEnd: 8,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              alignSelf: 'center',
+                            }}
+                            onPress={() => dismissFriendRequest(f.user_id)}>
+                            <MaterialIcons
+                              style={{alignSelf: 'center'}}
+                              name="close"
+                              color={'rgb(255,255,255)'}
+                              size={24}
+                            />
+                          </TouchableOpacity>
                         </View>
-
-                        <Button
-                          title="Kabul Et"
-                          onPress={() =>
-                            acceptFriendRequest(f.user_id)
-                          }></Button>
-
-                        <Button
-                          title="Reddet"
-                          onPress={() =>
-                            dismissFriendRequest(f.user_id)
-                          }></Button>
                       </View>
                     ))}
                   </>

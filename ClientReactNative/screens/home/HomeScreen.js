@@ -7,6 +7,7 @@ import {
   StyleSheet,
   View,
   ScrollView,
+  RefreshControl,
   FlatList,
   Dimensions,
   Text,
@@ -89,19 +90,20 @@ const HomeSummaryScreen = ({nav}) => {
     }', '${global.pwd}')`;
   };
 
-  useLayoutEffect(() => {
+  const requestHome = () => {
     authorizedRequest('api/app/home/', {})
       .then((response) => response.json())
       .then((json) => {
         setMainReport(json);
         setLoadingMain(false);
-
         if (json.plan_exists) requestSubModules(json.plan.plan_id);
         setPlanExists(json.plan_exists);
       })
       .catch((error) => console.error(error))
       .finally(() => {});
-  }, []);
+  };
+
+  useLayoutEffect(() => requestHome(), []);
 
   const requestSubModules = (planId) => {
     momentDate.current = moment();
@@ -151,7 +153,11 @@ const HomeSummaryScreen = ({nav}) => {
           </View>
         </View>
       ) : (
-        <ScrollView style={{flex: 1, marginStart: 0, marginEnd: 0}}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={loadingMain} onRefresh={requestHome} />
+          }
+          style={{flex: 1, marginStart: 0, marginEnd: 0}}>
           {/* Navigation menu */}
           <View style={{flexDirection: 'row', marginTop: 12}}>
             <TouchableOpacity

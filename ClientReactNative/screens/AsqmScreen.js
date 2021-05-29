@@ -40,17 +40,6 @@ const AsqmScreen = ({navigation}) => {
       .then((response) => response.json())
       .then((json) => {
         setData(json.lessons);
-        // var newData = [];
-        // for (var i = 0; i != json.lessons.length; i++) {
-        //   let lesson = json.lessons[i];
-
-        //   newData.push({
-        //     title: {name: lesson.name, p: lesson.pc},
-        //     data: [{id: lesson.id, value: json.lessons[i].mostRecentPosts}],
-        //   });
-        // }
-        // console.log(newData);
-        // setData(newData);
       })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));

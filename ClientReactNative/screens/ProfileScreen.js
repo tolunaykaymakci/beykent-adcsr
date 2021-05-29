@@ -263,7 +263,7 @@ const ProfileScreen = ({route, navigation}) => {
             {/* Reports Stuff If Permitted */}
             {/* There may be graph hereeeeee */}
 
-            {userReport && (
+            {userReport && userReport.plans (
               <View style={{margin: 12}}>
                 <Text
                   style={{

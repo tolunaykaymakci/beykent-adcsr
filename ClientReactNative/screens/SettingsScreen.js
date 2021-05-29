@@ -17,6 +17,7 @@ import {authorizedRequest, dump, updateUserInfo} from '../Service';
 
 import InputDialog from '../src/components/dialogs/InputDialog';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import {GlobalColors} from '../src/GlobalStyles';
 
 // we need to re-request user data after any changes on this page
 
@@ -177,237 +178,293 @@ const SettingsScreen = ({route, navigation}) => {
           <View
             style={{
               flex: 1,
-              alignItems: 'center',
               marginTop: 12,
             }}>
             <View
-              style={{
-                borderRadius: 35,
-                overflow: 'hidden',
-                alignSelf: 'center',
-              }}>
-              <Image
-                source={
-                  global.user.p_img != null
-                    ? {uri: global.user.p_img}
-                    : require('../assets/profile_default.png')
-                }
-                style={{
-                  width: 70,
-                  height: 70,
-                }}
-                resizeMode="contain"
-              />
+              style={{backgroundColor: 'white', elevation: 2, borderRadius: 6}}>
+              <Text style={{marginTop: 12, marginStart: 12}}>Profil Resmi</Text>
+
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View
+                  style={{
+                    borderRadius: 24,
+                    overflow: 'hidden',
+                    alignSelf: 'center',
+                    margin: 12,
+                  }}>
+                  <Image
+                    source={
+                      global.user.p_img != null
+                        ? {uri: global.user.p_img}
+                        : require('../assets/profile_default.png')
+                    }
+                    style={{
+                      width: 48,
+                      height: 48,
+                    }}
+                    resizeMode="contain"
+                  />
+                </View>
+
+                <View
+                  style={{marginEnd: 12, alignSelf: 'center', marginTop: -27}}>
+                  {global.user.p_img ? (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: GlobalColors.accentColor,
+                          borderRadius: 6,
+                          padding: 8,
+                          alignItems: 'center',
+                        }}>
+                        <Text style={{color: 'white'}}>Resmi Değiştir</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={{
+                          marginTop: 4,
+                          backgroundColor: GlobalColors.accentColor,
+                          borderRadius: 6,
+                          padding: 8,
+                          alignItems: 'center',
+                        }}>
+                        <Text style={{color: 'white'}}>Resmi Kaldır</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: GlobalColors.accentColor,
+                        borderRadius: 6,
+                        padding: 8,
+                        alignItems: 'center',
+                      }}>
+                      <Text style={{color: 'white'}}>Resim Yükle</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
             </View>
 
-            <Text
+            <View
               style={{
-                fontSize: 18,
-                fontWeight: 'bold',
-                textAlign: 'center',
-                marginTop: 8,
-                marginBottom: 16,
+                backgroundColor: 'white',
+                elevation: 2,
+                borderRadius: 6,
+                marginTop: 12,
               }}>
-              @{global.user.username}
-            </Text>
+              <Text style={{marginTop: 12, marginStart: 12, marginBottom: 12}}>
+                Hesap Ayarlarım
+              </Text>
 
-            <Button
+              <TouchableOpacity
+                onPress={() => setUnChangeVisible(true)}
+                style={styles.actionButton}>
+                <View style={{flexDirection: 'row'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center', marginEnd: 8}}
+                    name="edit"
+                    color={'rgb(58,79,101)'}
+                    size={22}
+                  />
+                  <View style={{alignSelf: 'center'}}>
+                    <Text>Kullanıcı Adım</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 13}}>
+                      @{global.user.username}
+                    </Text>
+                  </View>
+                </View>
+                <MaterialIcons
+                  style={{alignSelf: 'center', marginEnd: 24}}
+                  name="chevron-right"
+                  color={'rgb(58,79,101)'}
+                  size={23}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setDnChangeVisible(true)}
+                style={styles.actionButton}>
+                <View style={{flexDirection: 'row'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center', marginEnd: 8}}
+                    name="edit"
+                    color={'rgb(58,79,101)'}
+                    size={22}
+                  />
+                  <View style={{alignSelf: 'center'}}>
+                    <Text>Hesap İsmim</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 13}}>
+                      {global.user.disp_name}
+                    </Text>
+                  </View>
+                </View>
+                <MaterialIcons
+                  style={{alignSelf: 'center', marginEnd: 24}}
+                  name="chevron-right"
+                  color={'rgb(58,79,101)'}
+                  size={23}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setEmChangeVisible(true)}
+                style={styles.actionButton}>
+                <View style={{flexDirection: 'row'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center', marginEnd: 8}}
+                    name="edit"
+                    color={'rgb(58,79,101)'}
+                    size={22}
+                  />
+                  <View style={{alignSelf: 'center'}}>
+                    <Text>Email Adresim</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 13}}>
+                      {global.user.user_mail}
+                    </Text>
+                  </View>
+                </View>
+                <MaterialIcons
+                  style={{alignSelf: 'center', marginEnd: 24}}
+                  name="chevron-right"
+                  color={'rgb(58,79,101)'}
+                  size={23}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setPsChangeVisible(true)}
+                style={styles.actionButton}>
+                <View style={{flexDirection: 'row'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center', marginEnd: 8}}
+                    name="edit"
+                    color={'rgb(58,79,101)'}
+                    size={22}
+                  />
+                  <View style={{alignSelf: 'center'}}>
+                    <Text>Şifremi Değiştir</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 13}}>
+                      Değiştirmek İçin Dokun
+                    </Text>
+                  </View>
+                </View>
+                <MaterialIcons
+                  style={{alignSelf: 'center', marginEnd: 24}}
+                  name="chevron-right"
+                  color={'rgb(58,79,101)'}
+                  size={23}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                backgroundColor: 'white',
+                elevation: 2,
+                borderRadius: 6,
+                marginTop: 12,
+              }}>
+              <Text style={{marginTop: 12, marginStart: 12, marginBottom: 12}}>
+                Gizlilik Ayarlarım
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => frSheet.current.open()}
+                style={styles.actionButton}>
+                <View style={{flexDirection: 'row'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center', marginEnd: 8}}
+                    name="edit"
+                    color={'rgb(58,79,101)'}
+                    size={22}
+                  />
+                  <View style={{alignSelf: 'center'}}>
+                    <Text>Arkadaşlık İsteği Gönderilebilsin</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 13}}>
+                      {global.user.set.fri_req_cb_sent ? 'Evet' : 'Hayır'}
+                    </Text>
+                  </View>
+                </View>
+                <MaterialIcons
+                  style={{alignSelf: 'center', marginEnd: 24}}
+                  name="chevron-right"
+                  color={'rgb(58,79,101)'}
+                  size={23}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => accessSheet.current.open()}
+                style={styles.actionButton}>
+                <View style={{flexDirection: 'row'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center', marginEnd: 8}}
+                    name="edit"
+                    color={'rgb(58,79,101)'}
+                    size={22}
+                  />
+                  <View style={{alignSelf: 'center'}}>
+                    <Text>Çalışma Raporlarımı Görebilenler</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 13}}>
+                      {global.user.set.st_det_rep_acc === 'OnlyMe'
+                        ? 'Sadece Ben'
+                        : global.user.set.st_det_rep_acc === 'OnlyFriends'
+                        ? 'Sadece Arkadaşlarım'
+                        : 'Herkes'}
+                    </Text>
+                  </View>
+                </View>
+                <MaterialIcons
+                  style={{alignSelf: 'center', marginEnd: 24}}
+                  name="chevron-right"
+                  color={'rgb(58,79,101)'}
+                  size={23}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* <Button
               title="Refresh"
               onPress={() => {
                 updateUserInfo(() => {
                   // reload here
                   setKey(new Date().getTime());
                 });
-              }}></Button>
+              }}></Button> */}
 
-            <TouchableOpacity style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
-                <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
-                  color={'rgb(58,79,101)'}
-                  size={22}
-                />
-                <Text style={{alignSelf: 'center'}}>Fotoğrafı Değiştir</Text>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setPsChangeVisible(true)}
-              style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
-                <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
-                  color={'rgb(58,79,101)'}
-                  size={22}
-                />
-                <Text style={{alignSelf: 'center'}}>Şifremi Değiştir</Text>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setUnChangeVisible(true)}
-              style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
-                <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
-                  color={'rgb(58,79,101)'}
-                  size={22}
-                />
-                <View style={{alignSelf: 'center'}}>
-                  <Text>Kullanıcı Adım</Text>
-                  <Text style={{fontWeight: 'bold', fontSize: 13}}>
-                    @{global.user.username}
+            <View
+              style={{
+                backgroundColor: 'white',
+                elevation: 2,
+                borderRadius: 6,
+                marginTop: 12,
+              }}>
+              <TouchableOpacity
+                onPress={() => logout()}
+                style={styles.actionButton}>
+                <View style={{flexDirection: 'row'}}>
+                  <MaterialIcons
+                    style={{alignSelf: 'center', marginEnd: 8}}
+                    name="edit"
+                    color={'rgb(58,79,101)'}
+                    size={22}
+                  />
+                  <Text style={{alignSelf: 'center'}}>
+                    Hesabımdan Çıkış Yap
                   </Text>
                 </View>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setDnChangeVisible(true)}
-              style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
                 <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
+                  style={{alignSelf: 'center', marginEnd: 24}}
+                  name="chevron-right"
                   color={'rgb(58,79,101)'}
-                  size={22}
+                  size={23}
                 />
-                <View style={{alignSelf: 'center'}}>
-                  <Text>Görünür İsim</Text>
-                  <Text style={{fontWeight: 'bold', fontSize: 13}}>
-                    @{global.user.disp_name}
-                  </Text>
-                </View>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              onPress={() => setEmChangeVisible(true)}
-              style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
-                <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
-                  color={'rgb(58,79,101)'}
-                  size={22}
-                />
-                <View style={{alignSelf: 'center'}}>
-                  <Text>Email Adresim</Text>
-                  <Text style={{fontWeight: 'bold', fontSize: 13}}>
-                    {global.user.user_mail}
-                  </Text>
-                </View>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => frSheet.current.open()}
-              style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
-                <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
-                  color={'rgb(58,79,101)'}
-                  size={22}
-                />
-                <View style={{alignSelf: 'center'}}>
-                  <Text>Arkadaşlık İsteği Gönderilebilsin</Text>
-                  <Text style={{fontWeight: 'bold', fontSize: 13}}>
-                    {global.user.set.fri_req_cb_sent ? 'Evet' : 'Hayır'}
-                  </Text>
-                </View>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => accessSheet.current.open()}
-              style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
-                <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
-                  color={'rgb(58,79,101)'}
-                  size={22}
-                />
-                <View style={{alignSelf: 'center'}}>
-                  <Text>Çalışma Raporlarımı Görebilenler</Text>
-                  <Text style={{fontWeight: 'bold', fontSize: 13}}>
-                    {global.user.set.st_det_rep_acc === 'OnlyMe'
-                      ? 'Sadece Ben'
-                      : global.user.set.st_det_rep_acc === 'OnlyFriends'
-                      ? 'Sadece Arkadaşlarım'
-                      : 'Herkes'}
-                  </Text>
-                </View>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => logout()}
-              style={styles.actionButton}>
-              <View style={{flexDirection: 'row', marginStart: 12}}>
-                <MaterialIcons
-                  style={{alignSelf: 'center', marginEnd: 8}}
-                  name="edit"
-                  color={'rgb(58,79,101)'}
-                  size={22}
-                />
-                <Text style={{alignSelf: 'center'}}>Hesabımdan Çıkış Yap</Text>
-              </View>
-              <MaterialIcons
-                style={{alignSelf: 'center', marginEnd: 12}}
-                name="close"
-                color={'rgb(58,79,101)'}
-                size={23}
-              />
-            </TouchableOpacity>
-
-            <Text>id = {global.user.a_id}</Text>
+            <Text style={{marginTop: 18}}>id = {global.user.a_id}</Text>
           </View>
         </ScrollView>
       )}
@@ -480,12 +537,9 @@ const styles = StyleSheet.create({
     marginStart: 16,
     width: '100%',
     marginEnd: 16,
-    marginTop: 3,
     justifyContent: 'space-between',
-    marginBottom: 3,
     backgroundColor: 'white',
     height: 54,
-    elevation: 0.5,
   },
 });
 export default SettingsScreen;

@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   View,
   StatusBar,
+  Image,
   Text,
   TouchableOpacity,
 } from 'react-native';
@@ -370,28 +371,17 @@ const ErrorContainer = ({tryagain}) => {
 
 const SplashContainer = () => {
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#2A4159'}}>
-      <StatusBar backgroundColor={'#2A4159'} barStyle={'light-content'} />
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
+      <StatusBar backgroundColor={'#fff'} barStyle={'dark-content'} />
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <View
+        <Image
+          source={require('./assets/notebook.png')}
           style={{
-            ...GlobalStyles.primaryCard,
-            backgroundColor: '#2A4159',
-            width: 48,
-            height: 48,
-          }}>
-          <Progress.Circle
-            style={{
-              position: 'absolute',
-              margin: 12,
-              bottom: 0,
-            }}
-            color={'rgb(255,255,255)'}
-            thickness={40}
-            size={36}
-            indeterminate={true}
-          />
-        </View>
+            width: 82,
+            height: 82,
+          }}
+          resizeMode="contain"
+        />
       </View>
     </SafeAreaView>
   );
