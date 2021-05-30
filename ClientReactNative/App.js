@@ -68,7 +68,14 @@ const getTabBarVisibility = (route) => {
       ? route.state.routes[route.state.index].name
       : '';
 
-    const showTabsScreens = ['Home', 'AsqmEntrance', 'CommScreen', 'Settings'];
+    const showTabsScreens = [
+      'Home',
+      'AsqmEntrance',
+      'CommScreen',
+      'Settings',
+      'FriendsEntrance',
+      'Friends',
+    ];
 
     if (
       routeName == null ||
@@ -166,16 +173,6 @@ function HomeStack() {
         component={GuideScreen}
         options={{title: 'Puanlar'}}
       />
-      <Stack.Screen
-        name="Friends"
-        component={FriendsScreen}
-        options={{title: 'Arkadaşlarım'}}
-      />
-      <Stack.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{title: 'Profile Page'}}
-      />
     </Stack.Navigator>
   );
 }
@@ -226,7 +223,7 @@ function AsqmStack() {
 function CommStack() {
   return (
     <Stack.Navigator
-      initialRouteName="AsqmEntrance"
+      initialRouteName="FriendsEntrance"
       screenOptions={{
         headerStyle: {
           backgroundColor: '#fff',
@@ -238,9 +235,14 @@ function CommStack() {
         headerTitleStyle: {},
       }}>
       <Stack.Screen
-        name="CommScreen"
-        component={CommScreen}
-        options={{title: 'Test'}}
+        name="Friends"
+        component={FriendsScreen}
+        options={{title: 'Arkadaşlarım'}}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{title: 'Profile Page'}}
       />
     </Stack.Navigator>
   );
@@ -397,8 +399,9 @@ const AppContainer = () => {
       <Tab.Navigator
         initialRouteName="Feed"
         tabBarOptions={{
+          showLabel: false,
           activeTintColor: 'rgba(70,118,163,1)',
-          inactiveTintColor: 'rgba(0,0,0,.6)',
+          inactiveTintColor: 'rgba(0,0,0,.9)',
           style: {
             backgroundColor: 'white',
           },
@@ -410,7 +413,27 @@ const AppContainer = () => {
             tabBarVisible: getTabBarVisibility(route),
             tabBarLabel: 'Home',
             tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons name="home" color={color} size={size} />
+              <MaterialCommunityIcons
+                name="library"
+                color={color}
+                size={size}
+              />
+            ),
+          })}
+        />
+
+        <Tab.Screen
+          name="TogetherStack"
+          component={CommStack}
+          options={({route}) => ({
+            tabBarVisible: getTabBarVisibility(route),
+            tabBarLabel: 'Birlikte',
+            tabBarIcon: ({color, size}) => (
+              <MaterialCommunityIcons
+                name="account-group"
+                color={color}
+                size={size}
+              />
             ),
           })}
         />
@@ -422,27 +445,7 @@ const AppContainer = () => {
             tabBarVisible: getTabBarVisibility(route),
             tabBarLabel: 'Soru Paylaş',
             tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons
-                name="chart-bubble"
-                color={color}
-                size={size}
-              />
-            ),
-          })}
-        />
-
-        <Tab.Screen
-          name="CommStack"
-          component={CommStack}
-          options={({route}) => ({
-            tabBarVisible: getTabBarVisibility(route),
-            tabBarLabel: 'test',
-            tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons
-                name="chart-bubble"
-                color={color}
-                size={size}
-              />
+              <MaterialCommunityIcons name="pencil" color={color} size={size} />
             ),
           })}
         />

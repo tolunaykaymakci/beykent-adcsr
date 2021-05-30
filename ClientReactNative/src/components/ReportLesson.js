@@ -8,9 +8,9 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import RIDS from '../../screens/home/ReportItemDetailsScreen';
 import {GlobalColors} from '../GlobalStyles';
-import QuestionReportSubject from './QuestionReportSubject';
+import ReportSubject from './ReportSubject';
 
-const QuestionReportLesson = ({rlesson, nav}) => {
+const ReportLesson = ({rlesson, type, nav}) => {
   function colorIntToHex(num) {
     num >>>= 0;
     var b = num & 0xff,
@@ -76,13 +76,17 @@ const QuestionReportLesson = ({rlesson, nav}) => {
               size={12.5}
             />
             <Text>{rlesson.subjects.length} konu</Text>
-            <MaterialIcons
-              style={{alignSelf: 'center', marginStart: 6, display: 'none'}}
-              name="insert-drive-file"
-              color={'rgb(58,79,101)'}
-              size={12.5}
-            />
-            <Text>{rlesson.test_count} test</Text>
+            {type === 'questions' && (
+              <>
+                <MaterialIcons
+                  style={{alignSelf: 'center', marginStart: 6, display: 'none'}}
+                  name="insert-drive-file"
+                  color={'rgb(58,79,101)'}
+                  size={12.5}
+                />
+                <Text>{rlesson.test_count} test</Text>
+              </>
+            )}
           </View>
         </View>
 
@@ -105,7 +109,7 @@ const QuestionReportLesson = ({rlesson, nav}) => {
                 fontSize: 16,
                 fontWeight: 'bold',
               }}>
-              {rlesson.solved}
+              {type === 'questions' ? rlesson.solved : rlesson.studied}
             </Text>
 
             <Text
@@ -114,26 +118,24 @@ const QuestionReportLesson = ({rlesson, nav}) => {
                 fontSize: 14,
                 color: GlobalColors.subText,
                 marginStart: 4,
-                marginEnd: 2,
+                marginEnd: 6,
               }}>
-              SORU
+              {type === 'questions' ? 'SORU' : 'dakika'}
             </Text>
-
-            {/* <MaterialCommunityIcons
-              style={{alignSelf: 'center'}}
-              name="chevron-right"
-              color={'rgb(58,79,101)'}
-              size={22}
-            /> */}
           </View>
         </View>
       </TouchableOpacity>
 
       {rlesson.subjects.map((subj, i) => (
-        <QuestionReportSubject lessonRef={rlesson} rsubject={subj} nav={nav} />
+        <ReportSubject
+          lessonRef={rlesson}
+          type={type}
+          rsubject={subj}
+          nav={nav}
+        />
       ))}
     </View>
   );
 };
 
-export default QuestionReportLesson;
+export default ReportLesson;

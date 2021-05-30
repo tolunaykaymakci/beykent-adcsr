@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   Text,
+  Alert,
   Button,
   Image,
   ScrollView,
@@ -18,6 +19,9 @@ import {authorizedRequest, dump, updateUserInfo} from '../Service';
 import InputDialog from '../src/components/dialogs/InputDialog';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {GlobalColors} from '../src/GlobalStyles';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {useIsFocused} from '@react-navigation/native';
+import DataTransmission from '../src/transmission/DataTransmission';
 
 // we need to re-request user data after any changes on this page
 
@@ -107,28 +111,45 @@ const SettingsScreen = ({route, navigation}) => {
   const [dnChangeVisible, setDnChangeVisible] = useState(false);
   const [emChangeVisible, setEmChangeVisible] = useState(false);
   const [psChangeVisible, setPsChangeVisible] = useState(false);
+  const isFocused = useIsFocused();
 
   const frSheet = useRef();
-  const accessSheet = useState();
+  const accessSheet = useRef();
 
   useEffect(() => {
-    dump(global.user);
-  }, []);
+    updateUserInfo(() => {
+      // reload here
+      setKey(new Date().getTime());
+    });
+  }, [isFocused]);
 
   const logout = async () => {
-    try {
-      global.cred = null;
-      global.pwd = null;
-      global.user = null;
-      await AsyncStorage.removeItem('login_user');
-      await AsyncStorage.removeItem('login_pwd');
-      DevSettings.reload();
-    } catch (error) {}
+    Alert.alert(
+      'Çıkış Yap?',
+      'Hesabınızdan çıkış yapmak istediğine emin misin?',
+      [
+        {
+          text: 'Vazgeç',
+          style: 'cancel',
+        },
+        {
+          text: 'Evet',
+          onPress: async () => {
+            try {
+              global.cred = null;
+              global.pwd = null;
+              global.user = null;
+              await AsyncStorage.removeItem('login_user');
+              await AsyncStorage.removeItem('login_pwd');
+              DevSettings.reload();
+            } catch (error) {}
+          },
+        },
+      ],
+    );
   };
 
   const setSetting = (s_key, s_val, s_type) => {
-    console.log(s_key, s_val, s_type);
-
     authorizedRequest('ss/a/settings/set', {s_key, s_val, s_type})
       .then((response) => {
         updateUserInfo(() => {
@@ -139,22 +160,18 @@ const SettingsScreen = ({route, navigation}) => {
       .catch((error) => console.error(error));
   };
 
-  const changeName = (which, newValue) => {
-    /* parameter "info" possible values:
-       0 => username,
-       1 => display_name,
-       2 => random_username,
-       3 => email change,
-       4 => password change (adcsr only!!)
-     */
-
+  const changeUsername = (newValue) => {
     authorizedRequest('ss/a/name/change', {
       f: false,
       value: newValue,
-      info: which,
+      info: 0,
     })
       .then((response) => response.json())
-      .then((json) => {
+      .then(async (json) => {
+        // Update creds info
+        await AsyncStorage.setItem('login_user', newValue);
+        global.cred = newValue;
+
         updateUserInfo(() => {
           // reload here
           setKey(new Date().getTime());
@@ -162,6 +179,95 @@ const SettingsScreen = ({route, navigation}) => {
       })
       .catch((error) => console.error(error))
       .finally(() => {});
+  };
+
+  const changeUserInfo = (which, newValue) => {
+    /* parameter "info" possible values:
+       0 => display_name,
+       1 => email change (adcsr only!!),
+       2 => password change (adcsr only!!)
+     */
+
+    var params;
+
+    if (which === 0) params = {dn_changed: true, dn: newValue};
+    if (which === 1) params = {em_changed: true, em: newValue};
+    if (which === 2) params = {pwd_changed: true, pwd: newValue};
+
+    authorizedRequest('api/account/info/edit', params)
+      .then(async (response) => {
+        if (response.status === 400) {
+          response.text().then(function (text) {
+            alert(text);
+          });
+          return;
+        }
+
+        if (which === 2) {
+          await AsyncStorage.setItem('login_pwd', newValue);
+          global.pwd = newValue;
+        }
+
+        hideInputs();
+        updateUserInfo(() => {
+          // reload here
+          setKey(new Date().getTime());
+        });
+      })
+      .catch((error) => alert(error));
+  };
+
+  const setUserPicture = () => {
+    launchImageLibrary(
+      {mediaType: 'photo', quality: 0.4, includeBase64: true},
+      (response) => {
+        if (response.didCancel) return;
+
+        var transmitter = new DataTransmission();
+        transmitter.setEntryPoint('ss/a/picture/change');
+
+        transmitter.dataBytes = [];
+        transmitter.request.ds = [];
+
+        var Buffer = require('buffer/').Buffer;
+
+        let bytes = Buffer.from(response.base64, 'base64');
+        var sbytes = [];
+
+        // Convert byte[] to sbyte[] because server prefers that
+        for (var b = 0; b != bytes.length; b++) {
+          var sbyte = (bytes[b] & 127) - (bytes[b] & 128);
+          sbytes.push(sbyte);
+        }
+
+        transmitter.dataBytes.push(sbytes);
+        transmitter.request.ds.push(response.fileSize);
+
+        transmitter.registerEvents(
+          null,
+          (completed) => {
+            updateUserInfo(() => {
+              // reload here
+              setKey(new Date().getTime());
+            });
+          },
+          (failed) => {},
+        );
+
+        transmitter.beginTransmission();
+      },
+    );
+  };
+
+  const removeUserPicture = () => {
+    authorizedRequest('ss/a/picture/remove', {})
+      .then(async (response) => {
+        updateUserInfo(() => {
+          // reload here
+          setKey(new Date().getTime());
+        });
+      })
+      .catch((error) => alert(error));
   };
 
   const hideInputs = () => {
@@ -195,23 +301,24 @@ const SettingsScreen = ({route, navigation}) => {
                   }}>
                   <Image
                     source={
-                      global.user.p_img != null
-                        ? {uri: global.user.p_img}
+                      global.user.p_url != null
+                        ? {uri: global.user.p_url}
                         : require('../assets/profile_default.png')
                     }
                     style={{
                       width: 48,
                       height: 48,
                     }}
-                    resizeMode="contain"
+                    resizeMode="cover"
                   />
                 </View>
 
                 <View
                   style={{marginEnd: 12, alignSelf: 'center', marginTop: -27}}>
-                  {global.user.p_img ? (
+                  {global.user.p_url ? (
                     <>
                       <TouchableOpacity
+                        onPress={setUserPicture}
                         style={{
                           backgroundColor: GlobalColors.accentColor,
                           borderRadius: 6,
@@ -222,6 +329,7 @@ const SettingsScreen = ({route, navigation}) => {
                       </TouchableOpacity>
 
                       <TouchableOpacity
+                        onPress={removeUserPicture}
                         style={{
                           marginTop: 4,
                           backgroundColor: GlobalColors.accentColor,
@@ -234,6 +342,7 @@ const SettingsScreen = ({route, navigation}) => {
                     </>
                   ) : (
                     <TouchableOpacity
+                      onPress={setUserPicture}
                       style={{
                         backgroundColor: GlobalColors.accentColor,
                         borderRadius: 6,
@@ -471,27 +580,33 @@ const SettingsScreen = ({route, navigation}) => {
 
       <InputDialog
         title="Şifre Değiştir"
+        inputType="password"
+        current=""
         visible={psChangeVisible}
         confirm={(val) => {
-          changeName(4, val);
+          changeUserInfo(2, val);
         }}
         dismiss={() => hideInputs()}
       />
 
       <InputDialog
         title="Email Adres"
+        inputType="email-address"
+        current={global.user.user_mail}
         visible={emChangeVisible}
         confirm={(val) => {
-          changeName(3, val);
+          changeUserInfo(1, val);
         }}
         dismiss={() => hideInputs()}
       />
 
       <InputDialog
         title="Hesap İsmi"
+        inputType="default"
+        current={global.user.disp_name}
         visible={dnChangeVisible}
         confirm={(val) => {
-          changeName(1, val);
+          changeUserInfo(0, val);
         }}
         dismiss={() => hideInputs()}
       />
@@ -499,8 +614,9 @@ const SettingsScreen = ({route, navigation}) => {
       <InputDialog
         title="Kullanıcı Adı Değiştir"
         visible={unChangeVisible}
+        current={global.user.username}
         confirm={(val) => {
-          changeName(0, val);
+          changeUsername(val);
         }}
         dismiss={() => hideInputs()}
       />

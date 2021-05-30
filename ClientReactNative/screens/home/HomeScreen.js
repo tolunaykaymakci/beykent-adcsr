@@ -137,6 +137,25 @@ const HomeSummaryScreen = ({nav}) => {
 
   return (
     <View style={{flex: 1, backgroundColor: GlobalColors.windowBackground}}>
+      {nav.setOptions({
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => nav.navigate('Plans')}
+            style={{
+              backgroundColor: GlobalColors.accentColor,
+              borderTopLeftRadius: 6,
+              borderBottomLeftRadius: 6,
+              borderTopRightRadius: 21,
+              borderBottomRightRadius: 21,
+              padding: 8,
+              marginRight: 8,
+              alignItems: 'center',
+            }}>
+            <Text style={{color: 'white'}}>Çalışma Planlarım</Text>
+          </TouchableOpacity>
+        ),
+      })}
+
       {loadingMain ? (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <View style={{...GlobalStyles.primaryCard, width: 48, height: 48}}>
@@ -159,35 +178,8 @@ const HomeSummaryScreen = ({nav}) => {
           }
           style={{flex: 1, marginStart: 0, marginEnd: 0}}>
           {/* Navigation menu */}
-          <View style={{flexDirection: 'row', marginTop: 12}}>
-            <TouchableOpacity
-              style={styles.navMenuButtonLeft}
-              onPress={() => nav.navigate('Plans')}>
-              <MaterialCommunityIcons
-                style={{alignSelf: 'center'}}
-                name="clipboard-text"
-                color={'rgb(58,79,101)'}
-                size={22}
-              />
 
-              <Text style={styles.navMenuLabel}>Çalışma Planlarım</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.navMenuButtonRight}
-              onPress={() => nav.navigate('Friends')}>
-              <MaterialCommunityIcons
-                style={{alignSelf: 'center'}}
-                name="account-group"
-                color={'rgb(58,79,101)'}
-                size={22}
-              />
-
-              <Text style={styles.navMenuLabel}>Arkadaşlarım</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={{flexDirection: 'row'}}>
+          <View style={{flexDirection: 'row', display: 'none'}}>
             <TouchableOpacity
               style={styles.navMenuButtonLeft}
               onPress={() => nav.navigate('Guide')}>

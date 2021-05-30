@@ -10,8 +10,15 @@ import {
 } from 'react-native';
 import {GlobalStyles} from '../../GlobalStyles';
 
-const InputDialog = ({visible, title, confirm, dismiss, inputType}) => {
-  const [currentValue, setCurrentValue] = useState(0);
+const InputDialog = ({
+  visible,
+  title,
+  confirm,
+  dismiss,
+  inputType,
+  current,
+}) => {
+  const [currentValue, setCurrentValue] = useState(current ?? 0);
 
   return (
     <View>
@@ -44,20 +51,20 @@ const InputDialog = ({visible, title, confirm, dismiss, inputType}) => {
             <TextInput
               keyboardType={inputType ?? 'numeric'}
               autoFocus={true}
+              autoCapitalize="none"
               onFocus={() => {
                 if (!inputType || inputType === 'numeric') {
-                if (currentValue == '0') {
-                  setCurrentValue('');
+                  if (currentValue == '0') {
+                    setCurrentValue('');
+                  }
                 }
-              }
               }}
               onBlur={() => {
-                
                 if (!inputType || inputType === 'numeric') {
-                if (currentValue == '') {
-                  setCurrentValue('0');
+                  if (currentValue == '') {
+                    setCurrentValue('0');
+                  }
                 }
-              }
               }}
               onChangeText={(text) => setCurrentValue(text)}
               style={{
@@ -74,7 +81,6 @@ const InputDialog = ({visible, title, confirm, dismiss, inputType}) => {
               <TouchableOpacity
                 onPress={() => {
                   dismiss();
-                  setCurrentValue(0);
                 }}
                 style={{
                   flex: 1,
@@ -94,7 +100,6 @@ const InputDialog = ({visible, title, confirm, dismiss, inputType}) => {
               <TouchableOpacity
                 onPress={() => {
                   confirm(currentValue);
-                  setCurrentValue(0);
                 }}
                 style={{
                   flex: 1,

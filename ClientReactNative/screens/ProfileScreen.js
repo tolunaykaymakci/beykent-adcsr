@@ -69,7 +69,7 @@ const ProfileScreen = ({route, navigation}) => {
             text: 'Evet',
             onPress: () => {
               authorizedRequest('ss/a/friends/remove', {
-                fr_id: userInfo.a_id,
+                fr_id: userInfo.fri_id,
               })
                 .then((response) => requestUserInfo())
                 .catch((error) => console.error(error))
@@ -136,7 +136,7 @@ const ProfileScreen = ({route, navigation}) => {
               <View
                 style={{
                   marginTop: 12,
-                  borderRadius: 25,
+                  borderRadius: 45,
                   overflow: 'hidden',
                   alignSelf: 'center',
                 }}>
@@ -147,10 +147,10 @@ const ProfileScreen = ({route, navigation}) => {
                       : require('../assets/profile_default.png')
                   }
                   style={{
-                    width: 50,
-                    height: 50,
+                    width: 90,
+                    height: 90,
                   }}
-                  resizeMode="contain"
+                  resizeMode="cover"
                 />
               </View>
 
@@ -263,7 +263,7 @@ const ProfileScreen = ({route, navigation}) => {
             {/* Reports Stuff If Permitted */}
             {/* There may be graph hereeeeee */}
 
-            {userReport && userReport.plans (
+            {userReport && userReport.plans && (
               <View style={{margin: 12}}>
                 <Text
                   style={{
@@ -339,7 +339,7 @@ const ProfileScreen = ({route, navigation}) => {
                       }}>
                       {plan.name}
                     </Text>
-                    <Button title="Soru Çözümlerine ->" />
+                    <Button title="Soru Çözümleri ->" />
                     <Button title="Konu Tekrarları ->" />
                   </View>
                 ))}

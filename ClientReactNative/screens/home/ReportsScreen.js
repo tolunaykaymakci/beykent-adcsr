@@ -19,7 +19,7 @@ import moment from 'moment';
 import {GlobalStyles, GlobalColors} from '../../src/GlobalStyles';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import QuestionReportLesson from '../../src/components/QuestionReportLesson';
+import ReportLesson from '../../src/components/ReportLesson';
 
 import RDS from './RecordDetailsScreen';
 
@@ -59,7 +59,7 @@ const RecordItem = ({title, nav, subj, desc, time, action}) => (
         color={'rgb(171,180,190)'}
         size={21}
       />
-      <Text style={{fontSize: 17}}>21:00</Text>
+      <Text style={{fontSize: 17}}>{time.substring(11, 16)}</Text>
     </View>
   </TouchableOpacity>
 );
@@ -68,7 +68,6 @@ function App({route, navigation}) {
   const {planId, mode, type} = route.params;
   const [report, setReport] = useState();
   const [records, setRecords] = useState();
-  const [recordList, setRecordList] = useState([]);
   const [showFab, setShowFab] = useState(false);
   const [programText, setProgramText] = useState();
   const [stateMode, setStateMode] = useState('daily');
@@ -120,14 +119,14 @@ function App({route, navigation}) {
 
   const requestReport = () => {
     setShowFab(false);
-    setReport(null);
+    //setReport(null);
     var repDateStr = momentDate.current.format('yyyy-MM-DD');
     graphWebView.current.injectJavaScript("enableHighlights('" + type + "')");
     graphWebView.current.injectJavaScript(makeGraphRequestJs(repDateStr));
 
     updateGraphControls();
 
-    /* Request questions report */
+    /* Request report */
     authorizedRequest('api/reports/' + type, {
       date: repDateStr,
       mode: currentMode.current,
@@ -136,16 +135,19 @@ function App({route, navigation}) {
       .then((response) => response.json())
       .then((json) => {
         currentReport.current = json;
-        qAnalyse();
         setReport(json);
         setShowFab(true);
 
-        setProgramPerc(json.perc);
+        if (type === 'questions') {
+          qAnalyse();
+          setProgramPerc(json.perc);
+        }
       })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .catch((error) => {
+        console.error(error);
+      });
 
-    /* Request questions records */
+    /* Request records */
     authorizedRequest('api/records/' + type, {
       mode: 'range',
       plan: planId,
@@ -153,32 +155,10 @@ function App({route, navigation}) {
       end: repDateStr,
     })
       .then((response) => response.json())
-      .then((json) => {
-        var DATA = [];
-
-        json.rec_packs.forEach((x, i) => {
-          let recDate = x.rec_date.split(' ')[0];
-
-          var found = false;
-          for (var i = 0; i != DATA.length; i++)
-            if (DATA[i].title == recDate) {
-              found = true;
-              DATA[i].data.push(x.lesson_name);
-              break;
-            }
-
-          if (!found)
-            DATA.push({
-              title: x.rec_date.split(' ')[0],
-              data: [x.lesson_name],
-            });
-        });
-
-        setRecordList(DATA);
-        setRecords(json.rec_packs);
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .then((json) =>
+        setRecords(type === 'questions' ? json.rec_packs : json.studies),
+      )
+      .catch((error) => console.error(error));
   };
 
   const previousReportDate = () => {
@@ -208,7 +188,12 @@ function App({route, navigation}) {
   };
 
   const updateGraphControls = () => {
-    let now = moment();
+    var check = moment().startOf('isoWeek');
+    var now = moment();
+    var wdl = check.date();
+    var ml = check.month();
+    var yl = check.year();
+
     let dd = momentDate.current.date(),
       dm = momentDate.current.month(),
       dy = momentDate.current.year(),
@@ -272,11 +257,11 @@ function App({route, navigation}) {
     var empty = r.t_empty;
     var other = r.t_other;
 
-    total = 250;
-    correct = 50;
-    wrong = 30;
-    empty = 20;
-    other = 150;
+    // total = 250;
+    // correct = 50;
+    // wrong = 30;
+    // empty = 20;
+    // other = 150;
 
     let percCorrect = (correct * 100) / total;
     let percWrong = (wrong * 100) / total;
@@ -287,11 +272,6 @@ function App({route, navigation}) {
     let tvw = Math.min(wrong) + ' (%' + percWrong + ')';
     let tve = Math.min(empty) + ' (%' + percEmpty + ')';
     let tvo = Math.min(other) + ' (%' + percOther + ')';
-
-    console.log(correct);
-    console.log(wrong);
-    console.log(empty);
-    console.log(other);
 
     setQan({
       tvc: tvc,
@@ -328,6 +308,7 @@ function App({route, navigation}) {
                   flexDirection: 'row',
                   alignSelf: 'flex-start',
                   paddingTop: 6,
+                  marginStart: 4,
                 }}>
                 <Text
                   onPress={() => {
@@ -339,9 +320,15 @@ function App({route, navigation}) {
                     }
                   }}
                   style={
-                    stateMode === 'daily'
-                      ? styles.modeButtonActive
-                      : styles.modeButton
+                    stateMode !== 'daily'
+                      ? styles.modeButton
+                      : {
+                          ...styles.modeButtonActive,
+                          borderBottomColor:
+                            type === 'questions'
+                              ? 'rgb(62, 116, 182)'
+                              : 'rgb(255, 141, 115)',
+                        }
                   }>
                   Günlük
                 </Text>
@@ -355,9 +342,15 @@ function App({route, navigation}) {
                     }
                   }}
                   style={
-                    stateMode === 'weekly'
-                      ? styles.modeButtonActive
-                      : styles.modeButton
+                    stateMode !== 'weekly'
+                      ? styles.modeButton
+                      : {
+                          ...styles.modeButtonActive,
+                          borderBottomColor:
+                            type === 'questions'
+                              ? 'rgb(62, 116, 182)'
+                              : 'rgb(255, 141, 115)',
+                        }
                   }>
                   Haftalık
                 </Text>
@@ -371,9 +364,15 @@ function App({route, navigation}) {
                     }
                   }}
                   style={
-                    stateMode === 'monthly'
-                      ? styles.modeButtonActive
-                      : styles.modeButton
+                    stateMode !== 'monthly'
+                      ? styles.modeButton
+                      : {
+                          ...styles.modeButtonActive,
+                          borderBottomColor:
+                            type === 'questions'
+                              ? 'rgb(62, 116, 182)'
+                              : 'rgb(255, 141, 115)',
+                        }
                   }>
                   Aylık
                 </Text>
@@ -409,7 +408,6 @@ function App({route, navigation}) {
             <View
               style={{
                 height: 132,
-                flexDirection: 'row',
                 marginTop: 12,
               }}>
               <WebView
@@ -510,9 +508,11 @@ function App({route, navigation}) {
                     marginStart: 4,
                     marginEnd: 4,
                   }}>
-                  {report.solved}
+                  {type === 'questions' ? report.solved : report.studied}
                 </Text>
-                <Text style={{fontSize: 16, alignSelf: 'center'}}>SORU</Text>
+                <Text style={{fontSize: 16, alignSelf: 'center'}}>
+                  {type === 'questions' ? 'SORU' : 'DAKIKA'}
+                </Text>
               </View>
 
               <View
@@ -558,24 +558,26 @@ function App({route, navigation}) {
                   <Text>{report.count_subject} konu</Text>
                 </View>
 
-                <View
-                  style={{
-                    ...GlobalStyles.primaryCard,
-                    borderRadius: 16,
-                    paddingTop: 8,
-                    paddingBottom: 8,
-                    marginStart: 4,
-                    marginEnd: 0,
-                    flexDirection: 'row',
-                  }}>
-                  <MaterialIcons
-                    style={{alignSelf: 'center', marginEnd: 3}}
-                    name="insert-drive-file"
-                    color={'rgb(58,79,101)'}
-                    size={15}
-                  />
-                  <Text>{report.count_test} test</Text>
-                </View>
+                {type === 'questions' && (
+                  <View
+                    style={{
+                      ...GlobalStyles.primaryCard,
+                      borderRadius: 16,
+                      paddingTop: 8,
+                      paddingBottom: 8,
+                      marginStart: 4,
+                      marginEnd: 0,
+                      flexDirection: 'row',
+                    }}>
+                    <MaterialIcons
+                      style={{alignSelf: 'center', marginEnd: 3}}
+                      name="insert-drive-file"
+                      color={'rgb(58,79,101)'}
+                      size={15}
+                    />
+                    <Text>{report.count_test} test</Text>
+                  </View>
+                )}
               </View>
 
               {/* Lesson Distributions */}
@@ -594,26 +596,6 @@ function App({route, navigation}) {
                   }}>
                   Derslere Dağılım
                 </Text>
-
-                {/* <View
-                  style={{
-                    flexDirection: 'row',
-                    marginTop: 11,
-                    marginEnd: 6,
-                    position: 'absolute',
-                    right: 0,
-                  }}>
-                  <Text style={{alignSelf: 'center', fontSize: 13}}>
-                    DERSLER VE KONULAR
-                  </Text>
-
-                  <MaterialCommunityIcons
-                    style={{alignSelf: 'center'}}
-                    name="chevron-down"
-                    color={'rgb(58,79,101)'}
-                    size={22}
-                  />
-                </View> */}
 
                 {report.lessons.length === 0 ? (
                   <View
@@ -634,7 +616,11 @@ function App({route, navigation}) {
                       }}></View>
 
                     <Text style={{fontWeight: 'bold'}}>
-                      Henüz soru çözümü eklenmemiş
+                      Henüz
+                      {type === 'questions'
+                        ? ' soru çözümü '
+                        : ' konu tekrarı '}
+                      eklenmemiş
                     </Text>
                     <Text style={{marginBottom: 12}}>
                       Şimdi eklemek için +'ya dokunun
@@ -643,8 +629,9 @@ function App({route, navigation}) {
                 ) : (
                   <View>
                     {report.lessons.map((rlesson, rli) => (
-                      <QuestionReportLesson
+                      <ReportLesson
                         rlesson={rlesson}
+                        type={type}
                         nav={navigation}
                       />
                     ))}
@@ -653,7 +640,7 @@ function App({route, navigation}) {
               </View>
 
               {/* Study Program */}
-              {programText === null ? (
+              {type !== 'questions' || programText === null ? (
                 <></>
               ) : (
                 <View
@@ -774,7 +761,7 @@ function App({route, navigation}) {
               )}
 
               {/* Correct, Wrong & Empty Analyze */}
-              {qan == null ? (
+              {type !== 'questions' || qan == null ? (
                 <></>
               ) : (
                 <View
@@ -873,22 +860,27 @@ function App({route, navigation}) {
                   Gün Saatlerine Dağılımı
                 </Text>
 
-                {records == null ? (
-                  <Text>Yükleniyor...</Text>
-                ) : (
+                {records &&
                   records.map((record) => (
                     <RecordItem
                       title={record.lesson_name}
+                      time={
+                        type == 'questions' ? record.rec_date : record.created
+                      }
                       subj={
-                        record.recs.length === 1
-                          ? record.recs[0].subject_name
-                          : record.recs.length + ' konu'
+                        type === 'questions'
+                          ? record.recs.length === 1
+                            ? record.recs[0].subject_name
+                            : record.recs.length + ' konu'
+                          : record.title
                       }
                       desc={
-                        record.total_solved +
-                        ' soru, ' +
-                        record.total_test +
-                        ' test'
+                        type === 'questions'
+                          ? record.total_solved +
+                            ' soru, ' +
+                            record.total_test +
+                            ' test'
+                          : record.duration + ' dakika'
                       }
                       nav={navigation}
                       action={() => {
@@ -898,8 +890,7 @@ function App({route, navigation}) {
                         });
                       }}
                     />
-                  ))
-                )}
+                  ))}
               </View>
             </View>
           )}
@@ -913,7 +904,10 @@ function App({route, navigation}) {
               })
             }
             style={{
-              backgroundColor: 'rgba(52, 106, 172, 1)',
+              backgroundColor:
+                type === 'questions'
+                  ? 'rgb(62, 116, 182)'
+                  : 'rgb(255, 141, 115)',
               width: 64,
               borderRadius: 32,
               height: 64,
@@ -996,7 +990,6 @@ const styles = StyleSheet.create({
     padding: 8,
     color: GlobalColors.titleText,
     fontWeight: 'bold',
-    borderBottomColor: 'rgb(62, 116, 182)',
     borderBottomWidth: 3,
   },
 });

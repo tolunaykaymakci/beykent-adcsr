@@ -9,7 +9,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import RIDS from '../../screens/home/ReportItemDetailsScreen';
 import {GlobalColors} from '../GlobalStyles';
 
-const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
+const ReportSubject = ({lessonRef, rsubject, type, nav}) => {
   function colorIntToHex(num) {
     num >>>= 0;
     var b = num & 0xff,
@@ -53,6 +53,7 @@ const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
           overflow: 'hidden',
           paddingStart: 4,
           paddingEnd: 4,
+          alignSelf: 'center',
         }}>
         <Text
           style={{
@@ -63,15 +64,17 @@ const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
           {rsubject.name}
         </Text>
 
-        <View style={{flexDirection: 'row', marginStart: 3}}>
-          <MaterialIcons
-            style={{alignSelf: 'center'}}
-            name="insert-drive-file"
-            color={'rgb(58,79,101)'}
-            size={12.5}
-          />
-          <Text>{rsubject.test} test</Text>
-        </View>
+        {type === 'questions' && (
+          <View style={{flexDirection: 'row', marginStart: 3}}>
+            <MaterialIcons
+              style={{alignSelf: 'center'}}
+              name="insert-drive-file"
+              color={'rgb(58,79,101)'}
+              size={12.5}
+            />
+            <Text>{rsubject.test} test</Text>
+          </View>
+        )}
       </View>
 
       <View
@@ -92,7 +95,7 @@ const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
               fontSize: 16,
               fontWeight: 'bold',
             }}>
-            {rsubject.solved}
+            {type === 'questions' ? rsubject.solved : rsubject.studied}
           </Text>
 
           <Text
@@ -101,9 +104,9 @@ const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
               fontSize: 14,
               color: GlobalColors.subText,
               marginStart: 4,
-              marginEnd: 2,
+              marginEnd: 6,
             }}>
-            SORU
+            {type === 'questions' ? 'SORU' : 'dakika'}
           </Text>
 
           <MaterialCommunityIcons
@@ -118,4 +121,4 @@ const QuestionReportSubject = ({lessonRef, rsubject, nav}) => {
   );
 };
 
-export default QuestionReportSubject;
+export default ReportSubject;
