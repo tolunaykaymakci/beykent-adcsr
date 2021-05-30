@@ -67,7 +67,7 @@ const ManTestSheet = ({refs, confirm, subjectsRef}) => {
   function calculateEmptyCount() {
     var qc = Number(currentTdi.current.totalCount);
     var cc = Number(currentTdi.current.correctCount);
-    var wc = Number(currentTdi.currentwrongCount);
+    var wc = Number(currentTdi.current.wrongCount);
     var ec = Number(qc - (cc + wc));
     setECount(ec);
   }
@@ -93,6 +93,7 @@ const ManTestSheet = ({refs, confirm, subjectsRef}) => {
     var tdi =
       refs.current.xmys != null ? refs.current.xmys : new TestDataItem(true);
 
+    currentTdi.current = tdi;
     if (tdi.placeholder) {
       setShowDelete(false);
       manMode.current = 'add';
@@ -114,9 +115,6 @@ const ManTestSheet = ({refs, confirm, subjectsRef}) => {
       setTestSubject(tdi.subject_title);
       calculateEmptyCount();
     }
-
-    currentTdi.current = tdi;
-    dump(currentTdi.current);
   }
 
   return (

@@ -87,6 +87,7 @@ function App({route, navigation}) {
   const currentReport = useRef();
 
   useEffect(() => {
+    currentMode.current = 'daily';
     navigation.setOptions({
       headerTitle:
         type === 'questions' ? 'Soru Çözümlerim' : 'Konu Tekrarlarım',
@@ -268,10 +269,10 @@ function App({route, navigation}) {
     let percEmpty = (empty * 100) / total;
     let percOther = (other * 100) / total;
 
-    let tvc = Math.min(correct) + ' (%' + percCorrect + ')';
-    let tvw = Math.min(wrong) + ' (%' + percWrong + ')';
-    let tve = Math.min(empty) + ' (%' + percEmpty + ')';
-    let tvo = Math.min(other) + ' (%' + percOther + ')';
+    let tvc = Math.min(correct) + ' (%' + Math.floor(percCorrect) + ')';
+    let tvw = Math.min(wrong) + ' (%' + Math.floor(percWrong) + ')';
+    let tve = Math.min(empty) + ' (%' + Math.floor(percEmpty) + ')';
+    let tvo = Math.min(other) + ' (%' + Math.floor(percOther) + ')';
 
     setQan({
       tvc: tvc,
@@ -281,13 +282,45 @@ function App({route, navigation}) {
       tqe: !((((correct == wrong) == empty) == 0) == total),
     });
 
-    console.log({
-      tvc: tvc,
-      tvw: tvw,
-      tve: tve,
-      tvo: tvo,
-      tqe: !((((correct == wrong) == empty) == 0) == total),
-    });
+    // console.log({
+    //   tvc: tvc,
+    //   tvw: tvw,
+    //   tve: tve,
+    //   tvo: tvo,
+    //   tqe: !((((correct == wrong) == empty) == 0) == total),
+    // });
+  };
+
+  const reportChangeMode = (newMode) => {
+    var cmode = currentMode.current;
+    var now = moment();
+    if (currentMode === newMode) return;
+
+    let reportDate = momentDate.current;
+    if (newMode === 'monthly') {
+      reportDate.startOf('month');
+    } else if (cmode === 'monthly') {
+      reportDate.endOf('month');
+      if (reportDate.month() === now.month()) {
+        reportDate = now;
+      }
+      if (newMode === 'weekly') reportDate.startOf('isoWeek');
+    } else if (cmode === 'daily' && newMode === 'weekly') {
+      reportDate.startOf('isoWeek');
+    }
+
+    if (newMode === 'daily') {
+      currentMode.current = 'daily';
+      setStateMode('daily');
+    } else if (newMode === 'weekly') {
+      currentMode.current = 'weekly';
+      setStateMode('weekly');
+    } else {
+      currentMode.current = 'monthly';
+      setStateMode('monthly');
+    }
+
+    requestReport();
   };
 
   return (
@@ -311,14 +344,7 @@ function App({route, navigation}) {
                   marginStart: 4,
                 }}>
                 <Text
-                  onPress={() => {
-                    if (currentMode.current !== 'daily') {
-                      momentDate.current = moment('2021-04-09');
-                      currentMode.current = 'daily';
-                      setStateMode('daily');
-                      requestReport();
-                    }
-                  }}
+                  onPress={() => reportChangeMode('daily')}
                   style={
                     stateMode !== 'daily'
                       ? styles.modeButton
@@ -333,14 +359,7 @@ function App({route, navigation}) {
                   Günlük
                 </Text>
                 <Text
-                  onPress={() => {
-                    if (currentMode.current !== 'weekly') {
-                      momentDate.current = moment('2021-04-12');
-                      currentMode.current = 'weekly';
-                      setStateMode('weekly');
-                      requestReport();
-                    }
-                  }}
+                  onPress={() => reportChangeMode('weekly')}
                   style={
                     stateMode !== 'weekly'
                       ? styles.modeButton
@@ -355,14 +374,7 @@ function App({route, navigation}) {
                   Haftalık
                 </Text>
                 <Text
-                  onPress={() => {
-                    if (currentMode.current !== 'monthly') {
-                      momentDate.current = moment('2021-04-01');
-                      currentMode.current = 'monthly';
-                      setStateMode('monthly');
-                      requestReport();
-                    }
-                  }}
+                  onPress={() => reportChangeMode('monthly')}
                   style={
                     stateMode !== 'monthly'
                       ? styles.modeButton
@@ -860,37 +872,48 @@ function App({route, navigation}) {
                   Gün Saatlerine Dağılımı
                 </Text>
 
-                {records &&
-                  records.map((record) => (
-                    <RecordItem
-                      title={record.lesson_name}
-                      time={
-                        type == 'questions' ? record.rec_date : record.created
-                      }
-                      subj={
-                        type === 'questions'
-                          ? record.recs.length === 1
-                            ? record.recs[0].subject_name
-                            : record.recs.length + ' konu'
-                          : record.title
-                      }
-                      desc={
-                        type === 'questions'
-                          ? record.total_solved +
-                            ' soru, ' +
-                            record.total_test +
-                            ' test'
-                          : record.duration + ' dakika'
-                      }
-                      nav={navigation}
-                      action={() => {
-                        navigation.navigate('ManQuestions', {
-                          initDate: momentDate.current.format('yyyy-MM-DD'),
-                          recordPack: record,
-                        });
-                      }}
-                    />
-                  ))}
+                <View style={{marginTop: 12}}>
+                  {records &&
+                    records.map((record) => (
+                      <RecordItem
+                        title={record.lesson_name}
+                        time={
+                          type == 'questions' ? record.rec_date : record.created
+                        }
+                        subj={
+                          type === 'questions'
+                            ? record.recs.length === 1
+                              ? record.recs[0].subject_name
+                              : record.recs.length + ' konu'
+                            : record.title
+                        }
+                        desc={
+                          type === 'questions'
+                            ? record.total_solved +
+                              ' soru, ' +
+                              record.total_test +
+                              ' test'
+                            : record.duration + ' dakika'
+                        }
+                        nav={navigation}
+                        action={() => {
+                          type === 'questions'
+                            ? navigation.navigate('ManQuestions', {
+                                initDate: momentDate.current.format(
+                                  'yyyy-MM-DD',
+                                ),
+                                recordPack: record,
+                              })
+                            : navigation.navigate('ManStudy', {
+                                initDate: momentDate.current.format(
+                                  'yyyy-MM-DD',
+                                ),
+                                studies: record,
+                              });
+                        }}
+                      />
+                    ))}
+                </View>
               </View>
             </View>
           )}
@@ -899,9 +922,13 @@ function App({route, navigation}) {
         {showFab === false ? null : (
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate('ManQuestions', {
-                initDate: momentDate.current.format('yyyy-MM-DD'),
-              })
+              type === 'questions'
+                ? navigation.navigate('ManQuestions', {
+                    initDate: momentDate.current.format('yyyy-MM-DD'),
+                  })
+                : navigation.navigate('ManStudy', {
+                    initDate: momentDate.current.format('yyyy-MM-DD'),
+                  })
             }
             style={{
               backgroundColor:

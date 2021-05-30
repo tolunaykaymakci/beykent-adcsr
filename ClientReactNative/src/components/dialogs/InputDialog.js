@@ -80,6 +80,12 @@ const InputDialog = ({
             <View style={{flexDirection: 'row', marginTop: 12}}>
               <TouchableOpacity
                 onPress={() => {
+                  if (
+                    (!inputType || inputType === 'numeric') &&
+                    currentValue === ''
+                  ) {
+                    setCurrentValue(0);
+                  }
                   dismiss();
                 }}
                 style={{
@@ -99,7 +105,17 @@ const InputDialog = ({
 
               <TouchableOpacity
                 onPress={() => {
+                  if (
+                    (!inputType || inputType === 'numeric') &&
+                    currentValue === ''
+                  ) {
+                    setCurrentValue(0);
+                    confirm(0);
+                    return;
+                  }
+
                   confirm(currentValue);
+                  setCurrentValue(0);
                 }}
                 style={{
                   flex: 1,

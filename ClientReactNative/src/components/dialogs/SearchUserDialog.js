@@ -52,7 +52,7 @@ const SearchUserDialog = ({navigation, visible, dismiss}) => {
               padding: 16,
               width: '80%',
               paddingBottom: 10,
-              height: 340,
+              height: 270,
             }}>
             <Text style={{fontWeight: 'bold', fontSize: 19, marginBottom: 12}}>
               Kullanıcı Ara

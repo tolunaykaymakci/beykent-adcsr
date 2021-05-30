@@ -15,6 +15,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import {authorizedRequest, dump} from '../Service';
+import FullScreenProgress from '../src/components/FullScreenProgress';
 
 class GroupItem {
   drawHeader = false;
@@ -97,6 +98,8 @@ const StudyProgram = ({route, navigation}) => {
   const [items, setItems] = useState();
   const [typeText, setTypeText] = useState();
   const [showInput, setShowInput] = useState(false);
+  const [fspVisible, setFspVisible] = useState(true);
+  const [inputCurrent, setInputCurrent] = useState(0);
   const {plan, mode} = route.params;
 
   const currentType = useRef();
@@ -120,7 +123,9 @@ const StudyProgram = ({route, navigation}) => {
           }
         })
         .catch((error) => console.error(error))
-        .finally(() => {});
+        .finally(() => {
+          setFspVisible(false);
+        });
     }
   }, []);
 
@@ -150,6 +155,15 @@ const StudyProgram = ({route, navigation}) => {
       var rItem = new RepresenterItem();
       rItem.text = lesson.name;
       rItem.luid = lesson.lesson_id;
+
+      if (current) {
+        current.lessons.forEach((cl) => {
+          if (lesson.lesson_id === cl.lessonId) {
+            rItem.value = cl.target;
+          }
+        });
+      }
+
       repItems.push(rItem);
     });
 
@@ -183,6 +197,17 @@ const StudyProgram = ({route, navigation}) => {
         var rItem = new RepresenterItem();
         rItem.text = lesson.name;
         rItem.luid = lesson.lesson_id;
+
+        if (current) {
+          current.days.forEach((day) => {
+            day.lessons.forEach((cl) => {
+              if (day.day === wd[1] && lesson.lesson_id === cl.lessonId) {
+                rItem.value = cl.target;
+              }
+            });
+          });
+        }
+
         repItems.push(rItem);
       });
 
@@ -251,7 +276,9 @@ const StudyProgram = ({route, navigation}) => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView keyboardShouldPersistTaps="handled">
+      <FullScreenProgress visible={fspVisible} />
+
       <ProgramSelectSheet
         refs={programSheet}
         selected={(type) => {
@@ -267,7 +294,9 @@ const StudyProgram = ({route, navigation}) => {
         confirm={(val) => {
           updateRepresenterValue(val);
         }}
-        dismiss={() => setShowInput(false)}
+        dismiss={() => {
+          setShowInput(false);
+        }}
       />
       <TouchableOpacity
         onPress={() => programSheet.current.open()}
@@ -349,6 +378,7 @@ const StudyProgram = ({route, navigation}) => {
                     backColor={'#fff'}
                     action={() => {
                       inputRef.current = rep;
+                      setInputCurrent(rep.value);
                       setShowInput(true);
                     }}
                   />

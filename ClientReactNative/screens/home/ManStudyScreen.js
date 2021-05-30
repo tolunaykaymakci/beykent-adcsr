@@ -25,6 +25,8 @@ import {authorizedRequest} from '../../Service';
 import moment from 'moment';
 
 const ManStudyScreen = ({route, navigation}) => {
+  const {initDate, studies} = route.params;
+
   const [requestingPlans, setRequestingPlans] = useState(true);
   const [planText, setPlanText] = useState();
   const [lessonText, setLessonText] = useState();
@@ -49,34 +51,14 @@ const ManStudyScreen = ({route, navigation}) => {
   const timeSheet = useRef();
 
   useLayoutEffect(() => {
+    var initTime = moment().format('HH:mm:ss');
+    currentDate.current = moment(initDate + ' ' + initTime);
     setDateText(currentDate.current.format('yyyy-MM-DD HH:mm:ss'));
+
+    var xers = studies;
+
     requestPlans();
   }, []);
-
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => commitWithArrows()}
-          style={{
-            height: '100%',
-            justifyContent: 'center',
-          }}>
-          <MaterialIcons
-            style={{
-              alignSelf: 'center',
-              marginBottom: 9,
-              paddingEnd: 9,
-              paddingStart: 9,
-            }}
-            name="check"
-            color={GlobalColors.titleText}
-            size={26}
-          />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
 
   function requestPlans() {
     authorizedRequest('ss/sdb/plan/all', {})
@@ -84,6 +66,31 @@ const ManStudyScreen = ({route, navigation}) => {
       .then((json) => {
         plans.current = json.plans;
         currentPlan.current = plans.current[0];
+
+        let study = studies;
+        if (study) {
+          // Parse recordPack and convert it to mqs items
+
+          json.plans.forEach((plan, pi) => {
+            if (study.plan_name === plan.name) {
+              currentPlan.plan = plan;
+
+              plan.lessons.forEach((lesson, li) => {
+                if (study.lesson_name === lesson.name) {
+                  currentLesson.current = lesson;
+                  setLessonText(lesson.name);
+                  requestLessonSubjects();
+                }
+              });
+            }
+          });
+
+          currentDuration.current = study.duration;
+          setDurationText(study.duration);
+
+          currentDate.current = moment(study.created);
+          setDateText(currentDate.current.format('yyyy-MM-DD HH:mm:ss'));
+        }
 
         setPlanText(currentPlan.current.name);
         setRequestingPlans(false);
@@ -108,8 +115,6 @@ const ManStudyScreen = ({route, navigation}) => {
   }
 
   const commitWithArrows = () => {
-    let records = [];
-
     var editMode = false;
 
     let p = currentPlan.current;
@@ -130,7 +135,7 @@ const ManStudyScreen = ({route, navigation}) => {
       ? 'api/records/studies/edit'
       : 'api/records/studies/add';
     if (editMode) {
-      studyItem.study_id = -265;
+      studyItem.study_id = studies.study_id;
     }
 
     authorizedRequest(apiep, {item: studyItem})
@@ -255,6 +260,29 @@ const ManStudyScreen = ({route, navigation}) => {
           </View>
         </View>
       </ScrollView>
+
+      {navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => commitWithArrows()}
+            style={{
+              height: '100%',
+              justifyContent: 'center',
+            }}>
+            <MaterialIcons
+              style={{
+                alignSelf: 'center',
+                marginBottom: 9,
+                paddingEnd: 9,
+                paddingStart: 9,
+              }}
+              name="check"
+              color={GlobalColors.titleText}
+              size={26}
+            />
+          </TouchableOpacity>
+        ),
+      })}
     </SafeAreaView>
   );
 };

@@ -52,15 +52,17 @@ const ManQuestionsScreen = ({route, navigation}) => {
   const timeSheet = useRef();
   const testSheet = useRef();
 
+  const dropRecs = useRef([]);
+
   // Test objects
   const mqsItems = useRef([]);
 
   const [renderItems, setRenderItems] = useState([new TestDataItem(true)]);
 
   useLayoutEffect(() => {
-    if (recordPack) {
-      dump(recordPack);
-    }
+    navigation.setOptions({
+      headerTitle: recordPack ? 'Soru Çözümümü Düzenle' : 'Soru Çözümü Ekle',
+    });
 
     var initTime = moment().format('HH:mm:ss');
     currentDate.current = moment(initDate + ' ' + initTime);
@@ -68,37 +70,64 @@ const ManQuestionsScreen = ({route, navigation}) => {
     requestPlans();
   }, []);
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => commitWithArrows()}
-          style={{
-            height: '100%',
-            justifyContent: 'center',
-          }}>
-          <MaterialIcons
-            style={{
-              alignSelf: 'center',
-              marginBottom: 9,
-              paddingEnd: 9,
-              paddingStart: 9,
-            }}
-            name="check"
-            color={GlobalColors.titleText}
-            size={26}
-          />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-
   function requestPlans() {
     authorizedRequest('ss/sdb/plan/all', {})
       .then((response) => response.json())
       .then((json) => {
         plans.current = json.plans;
         currentPlan.current = plans.current[0];
+
+        if (recordPack) {
+          // Parse recordPack and convert it to mqs items
+
+          json.plans.forEach((plan, pi) => {
+            if (recordPack.plan_name === plan.name) {
+              currentPlan.plan = plan;
+
+              plan.lessons.forEach((lesson, li) => {
+                if (recordPack.lesson_name === lesson.name) {
+                  currentLesson.current = lesson;
+                  setLessonText(lesson.name);
+                  requestLessonSubjects();
+                }
+              });
+            }
+          });
+
+          currentDate.current = moment(recordPack.rec_date);
+          setDateText(currentDate.current.format('yyyy-MM-DD HH:mm:ss'));
+
+          var records = [];
+          recordPack.recs.forEach((r) => records.push(r.record_id));
+          dropRecs.current = [...records];
+
+          authorizedRequest('api/records/questions/tests', {
+            lesson: -1,
+            records,
+          })
+            .then((response) => response.json())
+            .then((json) => {
+              var records = json.records;
+
+              // Process mqs items
+              records.forEach((rec) => {
+                rec.tests.forEach((test) => {
+                  var tdi = new TestDataItem();
+                  tdi.placeholder = false;
+                  tdi.subject_title = rec.subject_name;
+                  tdi.totalCount = test.qc_total;
+                  tdi.correctCount = test.qc_correct;
+                  tdi.wrongCount = test.qc_wrong;
+                  tdi.detailed = test.is_detailed === 1;
+
+                  mqsItems.current.push(tdi);
+                });
+              });
+
+              setRenderItems([...mqsItems.current, new TestDataItem(true)]);
+            })
+            .catch((error) => console.error(error));
+        }
 
         setPlanText(currentPlan.current.name);
         setRequestingPlans(false);
@@ -118,14 +147,13 @@ const ManQuestionsScreen = ({route, navigation}) => {
         lessonSubjects.current = json.subjects;
         setSubjectsList(lessonSubjects.current);
       })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .catch((error) => console.error(error));
   }
 
   const commitWithArrows = () => {
     let records = [];
 
-    var editMode = false;
+    var editMode = recordPack !== null;
     var manageMode = 'tests';
     if (manageMode === 'tests') {
       mqsItems.current.forEach((tdi, i) => {
@@ -168,7 +196,7 @@ const ManQuestionsScreen = ({route, navigation}) => {
 
     var drop = null;
     if (editMode) {
-      drop = {};
+      drop = [...dropRecs.current];
     }
 
     authorizedRequest('ss/sdb/reports/records/manipulate', {
@@ -196,7 +224,7 @@ const ManQuestionsScreen = ({route, navigation}) => {
   return (
     <SafeAreaView
       style={{flex: 1, backgroundColor: GlobalColors.windowBackground}}>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <View
           style={{backgroundColor: GlobalColors.headerSecondary, elevation: 4}}>
           <PlanSelectSheet plans={plans.current} refs={plansSheet} />
@@ -248,7 +276,7 @@ const ManQuestionsScreen = ({route, navigation}) => {
             }}>
             <MaterialIcons
               style={{alignSelf: 'center', marginTop: 18}}
-              name="add"
+              name={!recordPack ? 'add' : 'edit'}
               color={'rgb(255,255,255)'}
               size={28}
             />
@@ -330,6 +358,29 @@ const ManQuestionsScreen = ({route, navigation}) => {
           </View>
         )}
       </ScrollView>
+
+      {navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity
+            onPress={() => commitWithArrows()}
+            style={{
+              height: '100%',
+              justifyContent: 'center',
+            }}>
+            <MaterialIcons
+              style={{
+                alignSelf: 'center',
+                marginBottom: 9,
+                paddingEnd: 9,
+                paddingStart: 9,
+              }}
+              name="check"
+              color={GlobalColors.titleText}
+              size={26}
+            />
+          </TouchableOpacity>
+        ),
+      })}
     </SafeAreaView>
   );
 };
