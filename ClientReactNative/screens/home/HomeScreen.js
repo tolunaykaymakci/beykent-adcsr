@@ -79,15 +79,11 @@ const HomeSummaryScreen = ({nav}) => {
   const momentDate = useRef(moment(Date.now()));
 
   const makeQGraphRequestJs = (date, pid) => {
-    return `req('${getAuthToken()}', 'questions', 'daily', ${pid}, '${date}', '${
-      global.cred
-    }', '${global.pwd}')`;
+    return `req(${global.user.a_id}, 'questions', 'daily', ${pid}, '${date}', '${global.cred}', '${global.pwd}')`;
   };
 
   const makeSGraphRequestJs = (date, pid) => {
-    return `req('${getAuthToken()}', 'studies', 'daily', ${pid}, '${date}', '${
-      global.cred
-    }', '${global.pwd}')`;
+    return `req(${global.user.a_id}, 'studies', 'daily', ${pid}, '${date}', '${global.cred}', '${global.pwd}')`;
   };
 
   const requestHome = () => {
@@ -118,8 +114,7 @@ const HomeSummaryScreen = ({nav}) => {
         setQReportData(json);
         setLoadingQReports(false);
       })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .catch((error) => console.error(error));
 
     authorizedRequest('api/app/home/stud', {})
       .then((response) => response.json())
@@ -131,8 +126,7 @@ const HomeSummaryScreen = ({nav}) => {
         setSReportData(json);
         setLoadingSReports(false);
       })
-      .catch((error) => console.error(error))
-      .finally(() => {});
+      .catch((error) => console.error(error));
   };
 
   return (
@@ -179,7 +173,7 @@ const HomeSummaryScreen = ({nav}) => {
           style={{flex: 1, marginStart: 0, marginEnd: 0}}>
           {/* Navigation menu */}
 
-          <View style={{flexDirection: 'row', display: 'none'}}>
+          <View style={{flexDirection: 'row'}}>
             <TouchableOpacity
               style={styles.navMenuButtonLeft}
               onPress={() => nav.navigate('Guide')}>

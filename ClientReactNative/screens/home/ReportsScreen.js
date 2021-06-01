@@ -4,10 +4,8 @@ import {
   Text,
   SafeAreaView,
   StyleSheet,
-  Button,
+  Image,
   TouchableOpacity,
-  Dimensions,
-  SectionList,
   ScrollView,
 } from 'react-native';
 
@@ -65,7 +63,7 @@ const RecordItem = ({title, nav, subj, desc, time, action}) => (
 );
 
 function App({route, navigation}) {
-  const {planId, mode, type} = route.params;
+  const {planId, mode, type, userref} = route.params;
   const [report, setReport] = useState();
   const [records, setRecords] = useState();
   const [showFab, setShowFab] = useState(false);
@@ -86,7 +84,11 @@ function App({route, navigation}) {
   const studyProgram = useRef();
   const currentReport = useRef();
 
+  const graphUserId = useRef();
+
   useEffect(() => {
+    graphUserId.current = userref ? userref.a_id : global.user.a_id;
+
     currentMode.current = 'daily';
     navigation.setOptions({
       headerTitle:
@@ -119,8 +121,9 @@ function App({route, navigation}) {
   }, [isFocused]);
 
   const requestReport = () => {
+    let user = userref;
+
     setShowFab(false);
-    //setReport(null);
     var repDateStr = momentDate.current.format('yyyy-MM-DD');
     graphWebView.current.injectJavaScript("enableHighlights('" + type + "')");
     graphWebView.current.injectJavaScript(makeGraphRequestJs(repDateStr));
@@ -132,6 +135,7 @@ function App({route, navigation}) {
       date: repDateStr,
       mode: currentMode.current,
       plan: planId,
+      user: user ? user.a_id : 0,
     })
       .then((response) => response.json())
       .then((json) => {
@@ -154,6 +158,7 @@ function App({route, navigation}) {
       plan: planId,
       start: repDateStr,
       end: repDateStr,
+      user: user ? user.a_id : 0,
     })
       .then((response) => response.json())
       .then((json) =>
@@ -244,9 +249,7 @@ function App({route, navigation}) {
   };
 
   const makeGraphRequestJs = (date) => {
-    return `req('${getAuthToken()}', '${type}', '${
-      currentMode.current
-    }', ${planId}, '${date}', '${global.cred}', '${global.pwd}')`;
+    return `req(${graphUserId.current}, '${type}', '${currentMode.current}', ${planId}, '${date}', '${global.cred}', '${global.pwd}')`;
   };
 
   const qAnalyse = () => {
@@ -326,6 +329,51 @@ function App({route, navigation}) {
   return (
     <SafeAreaView
       style={{flex: 1, backgroundColor: GlobalColors.windowBackground}}>
+      {userref && (
+        <View
+          style={{
+            backgroundColor: 'rgb(232,232,232)',
+            justifyContent: 'space-between',
+            height: 64,
+            flexDirection: 'row',
+          }}>
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Profile', {
+                  username: userref.username,
+                });
+              }}
+              style={{
+                borderRadius: 18,
+                overflow: 'hidden',
+                alignSelf: 'center',
+                marginStart: 12,
+              }}>
+              <Image
+                source={
+                  userref.p_url
+                    ? {uri: userref.p_url}
+                    : require('../../assets/profile_default.png')
+                }
+                style={{
+                  width: 36,
+                  height: 36,
+                }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+
+            <View style={{alignSelf: 'center', marginStart: 10}}>
+              <Text style={{fontWeight: 'bold'}}>{userref.disp_name}</Text>
+              <Text style={{fontSize: 14}}>@{userref.username}</Text>
+            </View>
+          </View>
+
+          <View style={{flexDirection: 'row'}}></View>
+        </View>
+      )}
+
       <View>
         {/* stateMode */}
         <ScrollView>
@@ -847,13 +895,13 @@ function App({route, navigation}) {
                       </View>
                     </View>
 
-                    <View
+                    {/* <View
                       style={{
                         width: 120,
                         height: 85,
                       }}>
                       <Text>perc</Text>
-                    </View>
+                    </View> */}
                   </View>
                 </View>
               )}

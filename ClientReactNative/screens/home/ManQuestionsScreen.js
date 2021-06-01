@@ -82,7 +82,7 @@ const ManQuestionsScreen = ({route, navigation}) => {
 
           json.plans.forEach((plan, pi) => {
             if (recordPack.plan_name === plan.name) {
-              currentPlan.plan = plan;
+              currentPlan.current = plan;
 
               plan.lessons.forEach((lesson, li) => {
                 if (recordPack.lesson_name === lesson.name) {

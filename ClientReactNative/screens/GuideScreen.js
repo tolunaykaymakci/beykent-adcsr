@@ -4,6 +4,7 @@ import {WebView} from 'react-native-webview';
 
 import * as Progress from 'react-native-progress';
 import {GlobalColors, GlobalStyles} from '../src/GlobalStyles';
+import {makeApiep} from '../Service';
 
 function App() {
   const [showLoading, setShowLoading] = useState(true);
@@ -11,11 +12,12 @@ function App() {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <WebView
+        cacheMode="LOAD_NO_CACHE"
+        cacheEnabled={false}
         onLoad={() => setShowLoading(false)}
         source={{
-          uri: 'https://sorusayaci.com/puanlar/yks-puan-hesaplama?adcsr=true',
+          uri: makeApiep('adcsr-calc.html?mode=yks'),
         }}
-        style={{marginTop: -67}}
       />
 
       {!showLoading ? (

@@ -1,4 +1,4 @@
-﻿import React, {useState, useEffect} from 'react';
+﻿import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,8 @@ const ProfileScreen = ({route, navigation}) => {
   const [userInfo, setUserInfo] = useState();
   const [userReport, setUserReport] = useState();
 
+  const userInfoRef = useRef();
+
   useEffect(() => {
     requestUserInfo();
   }, []);
@@ -33,18 +35,19 @@ const ProfileScreen = ({route, navigation}) => {
           headerTitle: '@' + json.username,
         });
 
+        userInfoRef.current = json;
         setUserInfo(json);
-        if (json.reports_accesible | 1) {
-          requestUserReports();
+        if (json.reports_accesible) {
+          requestUserReports(json.username);
         }
       })
       .catch((error) => console.error(error))
       .finally(() => {});
   };
 
-  const requestUserReports = () => {
+  const requestUserReports = (targetUsername) => {
     authorizedRequest('ss/sdb/reports/user/dash', {
-      target: userInfo.username,
+      target: targetUsername,
       current: global.user.username,
     })
       .then((response) => response.json())
@@ -156,10 +159,19 @@ const ProfileScreen = ({route, navigation}) => {
 
               <Text
                 style={{
+                  fontSize: 20,
+                  textAlign: 'center',
+                  marginTop: 8,
+                }}>
+                {userInfo.disp_name}
+              </Text>
+
+              <Text
+                style={{
                   fontSize: 18,
                   fontWeight: 'bold',
                   textAlign: 'center',
-                  marginTop: 8,
+                  marginTop: 3,
                 }}>
                 @{userInfo.username}
               </Text>
@@ -276,7 +288,13 @@ const ProfileScreen = ({route, navigation}) => {
                   Çalışma Özeti
                 </Text>
 
-                <View style={{flexDirection: 'row'}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    overflow: 'hidden',
+                    borderTopLeftRadius: 12,
+                    borderTopRightRadius: 12,
+                  }}>
                   <View
                     style={{
                       flex: 1,
@@ -295,10 +313,16 @@ const ProfileScreen = ({route, navigation}) => {
                       backgroundColor: 'rgba(0,255,0,.2)',
                       alignItems: 'center',
                     }}>
-                    <Text>Bu hafta: {userReport.tv}</Text>
+                    <Text>Bu hafta: {userReport.tw}</Text>
                   </View>
                 </View>
-                <View style={{flexDirection: 'row'}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    overflow: 'hidden',
+                    borderBottomLeftRadius: 12,
+                    borderBottomRightRadius: 12,
+                  }}>
                   <View
                     style={{
                       flex: 1,
@@ -307,7 +331,7 @@ const ProfileScreen = ({route, navigation}) => {
                       backgroundColor: 'rgba(0,0,255,.2)',
                       alignItems: 'center',
                     }}>
-                    <Text>Bu ay: {userReport.tv}</Text>
+                    <Text>Bu ay: {userReport.tm}</Text>
                   </View>
                   <View
                     style={{
@@ -317,7 +341,7 @@ const ProfileScreen = ({route, navigation}) => {
                       backgroundColor: 'rgba(255,0,255,.2)',
                       alignItems: 'center',
                     }}>
-                    <Text>Toplam: {userReport.tv}</Text>
+                    <Text>Toplam: {userReport.ttl}</Text>
                   </View>
                 </View>
 
@@ -329,7 +353,7 @@ const ProfileScreen = ({route, navigation}) => {
                       padding: 12,
                       borderRadius: 12,
                       marginTop: 12,
-                      marginBottom: 24,
+                      marginBottom: 12,
                     }}>
                     <Text
                       style={{
@@ -339,8 +363,28 @@ const ProfileScreen = ({route, navigation}) => {
                       }}>
                       {plan.name}
                     </Text>
-                    <Button title="Soru Çözümleri ->" />
-                    <Button title="Konu Tekrarları ->" />
+                    <Button
+                      title="Soru Çözümleri ->"
+                      onPress={() =>
+                        navigation.navigate('Reports', {
+                          planId: plan.plan_id,
+                          mode: 'daily',
+                          type: 'questions',
+                          userref: userInfoRef.current,
+                        })
+                      }
+                    />
+                    <Button
+                      title="Konu Tekrarları ->"
+                      onPress={() =>
+                        navigation.navigate('Reports', {
+                          planId: plan.plan_id,
+                          mode: 'daily',
+                          type: 'studies',
+                          userref: userInfoRef.current,
+                        })
+                      }
+                    />
                   </View>
                 ))}
               </View>

@@ -78,9 +78,7 @@ const DetailsScreen = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1, width: '100%', height: '100%'}}>
-      {plan == null ? (
-        <Text>Yükleniyor...</Text>
-      ) : (
+      {plan && (
         <>
           <TouchableOpacity
             onPress={deleteStudyPlan}

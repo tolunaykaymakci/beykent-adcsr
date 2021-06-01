@@ -109,7 +109,7 @@ function App({route, navigation}) {
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         {screenMode === 'friends' ? (
           <View>
             {friends && (
@@ -125,7 +125,7 @@ function App({route, navigation}) {
                         }}
                         style={{
                           backgroundColor: GlobalColors.primaryCard,
-                          elevation: 4,
+                          elevation: 2,
                           justifyContent: 'space-between',
                           borderRadius: 12,
                           marginStart: 12,
@@ -179,7 +179,7 @@ function App({route, navigation}) {
 
                         <MaterialIcons
                           style={{alignSelf: 'center', marginEnd: 12}}
-                          name="person-add"
+                          name="chevron-right"
                           color={'rgb(0,0,0)'}
                           size={28}
                         />
@@ -209,7 +209,7 @@ function App({route, navigation}) {
                           maxWidth: '80%',
                           textAlign: 'center',
                         }}>
-                        Arkadaşlarını ekleyin ve birlikte çalışmaya başlayın
+                        Arkadaşlarını ekle ve birlikte çalışmaya başla!
                       </Text>
                     </View>
                   </>
@@ -227,7 +227,7 @@ function App({route, navigation}) {
                       <View
                         style={{
                           backgroundColor: GlobalColors.primaryCard,
-                          elevation: 4,
+                          elevation: 2,
                           justifyContent: 'space-between',
                           borderRadius: 12,
                           marginStart: 12,

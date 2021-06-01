@@ -62,30 +62,24 @@ LogBox.ignoreAllLogs(); //Ignore all log notifications
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const getTabBarVisibility = (route) => {
+const showTabs = (route) => {
   try {
     const routeName = route.state
       ? route.state.routes[route.state.index].name
       : '';
 
-    const showTabsScreens = [
-      'Home',
-      'AsqmEntrance',
-      'CommScreen',
-      'Settings',
-      'FriendsEntrance',
-      'Friends',
-    ];
-
-    if (
-      routeName == null ||
-      routeName == '' ||
-      showTabsScreens.indexOf(routeName) > -1
-    ) {
-      return true;
-    }
-
-    return false;
+    return (
+      !routeName ||
+      routeName === '' ||
+      [
+        'Home',
+        'AsqmEntrance',
+        'CommScreen',
+        'Settings',
+        'FriendsEntrance',
+        'Friends',
+      ].indexOf(routeName) > -1
+    );
   } catch {
     return true;
   }
@@ -243,6 +237,11 @@ function CommStack() {
         name="Profile"
         component={ProfileScreen}
         options={{title: 'Profile Page'}}
+      />
+      <Stack.Screen
+        name="Reports"
+        component={ReportsScreen}
+        options={{title: 'Soru Çözümlerim'}}
       />
     </Stack.Navigator>
   );
@@ -410,7 +409,7 @@ const AppContainer = () => {
           name="HomeStack"
           component={HomeStack}
           options={({route}) => ({
-            tabBarVisible: getTabBarVisibility(route),
+            tabBarVisible: showTabs(route),
             tabBarLabel: 'Home',
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons
@@ -426,7 +425,7 @@ const AppContainer = () => {
           name="TogetherStack"
           component={CommStack}
           options={({route}) => ({
-            tabBarVisible: getTabBarVisibility(route),
+            tabBarVisible: showTabs(route),
             tabBarLabel: 'Birlikte',
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons
@@ -442,7 +441,7 @@ const AppContainer = () => {
           name="AsqmStack"
           component={AsqmStack}
           options={({route}) => ({
-            tabBarVisible: getTabBarVisibility(route),
+            tabBarVisible: showTabs(route),
             tabBarLabel: 'Soru Paylaş',
             tabBarIcon: ({color, size}) => (
               <MaterialCommunityIcons name="pencil" color={color} size={size} />

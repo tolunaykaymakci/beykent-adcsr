@@ -23,8 +23,13 @@ const SearchUserDialog = ({navigation, visible, dismiss}) => {
     getRequest('ss/a/search?adcsr=true&pattern=' + text)
       .then((response) => response.json())
       .then((json) => {
-        dump(json);
-        setResult(json.users);
+        // If our own account shows up here, just exclude that
+        var res = [];
+        json.users.forEach((u) => {
+          if (u.username !== global.user.username) res.push(u);
+        });
+
+        setResult(res);
       })
       .catch((error) => console.error(error));
   };
@@ -78,12 +83,14 @@ const SearchUserDialog = ({navigation, visible, dismiss}) => {
 
             {!result ? (
               <Text style={{textAlign: 'center', marginTop: 16}}>
-                En az üç karakter girin
+                Aramak için yazmaya başla
               </Text>
             ) : (
               <View>
                 {result.length > 0 ? (
-                  <ScrollView>
+                  <ScrollView
+                    keyboardShouldPersistTaps="handled"
+                    style={{height: 168}}>
                     {result.map((f) => (
                       <TouchableOpacity
                         onPress={() => {
@@ -118,7 +125,7 @@ const SearchUserDialog = ({navigation, visible, dismiss}) => {
                                   width: 36,
                                   height: 36,
                                 }}
-                                resizeMode="contain"
+                                resizeMode="cover"
                               />
                             }
                           </View>
@@ -132,7 +139,7 @@ const SearchUserDialog = ({navigation, visible, dismiss}) => {
 
                         <MaterialIcons
                           style={{alignSelf: 'center', marginEnd: 6}}
-                          name="person-add"
+                          name="chevron-right"
                           color={'rgb(0,0,0)'}
                           size={28}
                         />

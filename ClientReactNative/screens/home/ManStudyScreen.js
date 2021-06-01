@@ -51,11 +51,13 @@ const ManStudyScreen = ({route, navigation}) => {
   const timeSheet = useRef();
 
   useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: studies ? 'Konu Çalışmamı Düzenle' : 'Konu Çalışması Ekle',
+    });
+
     var initTime = moment().format('HH:mm:ss');
     currentDate.current = moment(initDate + ' ' + initTime);
     setDateText(currentDate.current.format('yyyy-MM-DD HH:mm:ss'));
-
-    var xers = studies;
 
     requestPlans();
   }, []);
@@ -73,7 +75,7 @@ const ManStudyScreen = ({route, navigation}) => {
 
           json.plans.forEach((plan, pi) => {
             if (study.plan_name === plan.name) {
-              currentPlan.plan = plan;
+              currentPlan.current = plan;
 
               plan.lessons.forEach((lesson, li) => {
                 if (study.lesson_name === lesson.name) {
@@ -84,6 +86,9 @@ const ManStudyScreen = ({route, navigation}) => {
               });
             }
           });
+
+          currentSubject.current = study.title;
+          setSubjectText(study.title);
 
           currentDuration.current = study.duration;
           setDurationText(study.duration);
@@ -115,7 +120,7 @@ const ManStudyScreen = ({route, navigation}) => {
   }
 
   const commitWithArrows = () => {
-    var editMode = false;
+    var editMode = studies !== null;
 
     let p = currentPlan.current;
     let l = currentLesson.current;
@@ -145,7 +150,7 @@ const ManStudyScreen = ({route, navigation}) => {
       .then((json) => {
         if (Platform.OS == 'android') {
           ToastAndroid.showWithGravity(
-            'Konu çalışması eklendi',
+            editMode ? 'Konu çalışması düzenlendi' : 'Konu çalışması eklendi',
             ToastAndroid.SHORT,
             ToastAndroid.CENTER,
           );
@@ -213,7 +218,7 @@ const ManStudyScreen = ({route, navigation}) => {
             }}>
             <MaterialIcons
               style={{alignSelf: 'center', marginTop: 19}}
-              name="add"
+              name={studies ? 'edit' : 'add'}
               color={'rgb(255,255,255)'}
               size={32}
             />
@@ -263,24 +268,45 @@ const ManStudyScreen = ({route, navigation}) => {
 
       {navigation.setOptions({
         headerRight: () => (
-          <TouchableOpacity
-            onPress={() => commitWithArrows()}
-            style={{
-              height: '100%',
-              justifyContent: 'center',
-            }}>
-            <MaterialIcons
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              onPress={() => commitWithArrows()}
               style={{
-                alignSelf: 'center',
-                marginBottom: 9,
-                paddingEnd: 9,
-                paddingStart: 9,
-              }}
-              name="check"
-              color={GlobalColors.titleText}
-              size={26}
-            />
-          </TouchableOpacity>
+                height: '100%',
+                justifyContent: 'center',
+                marginEnd: 3,
+              }}>
+              <MaterialIcons
+                style={{
+                  alignSelf: 'center',
+                  marginBottom: 9,
+                  paddingEnd: 9,
+                  paddingStart: 9,
+                }}
+                name="delete"
+                color={GlobalColors.titleText}
+                size={26}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => commitWithArrows()}
+              style={{
+                height: '100%',
+                justifyContent: 'center',
+              }}>
+              <MaterialIcons
+                style={{
+                  alignSelf: 'center',
+                  marginBottom: 9,
+                  paddingEnd: 9,
+                  paddingStart: 9,
+                }}
+                name="check"
+                color={GlobalColors.titleText}
+                size={26}
+              />
+            </TouchableOpacity>
+          </View>
         ),
       })}
     </SafeAreaView>
