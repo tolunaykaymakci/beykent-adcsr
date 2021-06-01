@@ -251,6 +251,19 @@ const AsqmContainer = ({post, type, navigation}) => {
     alert('reportlamacaklar');
   };
 
+  const sendMyReply = (post_id) => {
+    authorizedRequest('post/reply', {post_id, body})
+      .then((response) => response.json())
+      .then((json) => {
+        // This may not work, we gonna have to test it goood!
+        post.replies.push(json.new_reply);
+
+        // we may rerequest all thread :( sad stuff
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {});
+  };
+
   return (
     <View
       style={[
@@ -426,10 +439,7 @@ const AsqmContainer = ({post, type, navigation}) => {
                     </View>
 
                     <Text style={{marginStart: 27, marginTop: -4}}>
-                      Merhabalar bu bir yanıttır. Merhabalar bu bir yanıttır
-                      Merhabalar bu bir yanıttır Merhabalar bu bir yanıttır
-                      Merhabalar bu bir yanıttır Merhabalar bu bir yanıttır
-                      Merhabalar bu bir yanıttır
+                      {post.body}
                     </Text>
 
                     <MaterialIcons
@@ -474,8 +484,31 @@ const AsqmContainer = ({post, type, navigation}) => {
             />
             <View
               style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-              <Text onPress={() => setReplyVisible(false)}>Vazgeç</Text>
-              <Text>Gönder</Text>
+              <TouchableOpacity
+                onPress={() => setReplyVisible(false)}
+                style={{
+                  padding: 8,
+                  paddingStart: 18,
+                  paddingEnd: 18,
+                  borderRadius: 20,
+                  margin: 12,
+                  backgroundColor: GlobalColors.accentColor,
+                }}>
+                <Text style={{color: 'white'}}>VAZGEÇ</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => sendMyReply(post.post_id)}
+                style={{
+                  padding: 8,
+                  paddingStart: 18,
+                  paddingEnd: 18,
+                  borderRadius: 20,
+                  margin: 12,
+                  backgroundColor: GlobalColors.accentColor,
+                }}>
+                <Text style={{color: 'white'}}>GÖNDER</Text>
+              </TouchableOpacity>
             </View>
           </>
         ) : (
