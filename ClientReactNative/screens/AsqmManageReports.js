@@ -6,7 +6,7 @@ const AsqmManageReports = () => {
   const [reportedPosts, setReportedPosts] = useState();
 
   useEffect(() => {
-    authorizedRequest('post/report/manage', {})
+    authorizedRequest('ss/asqm/post/report/manage', {})
       .then((response) => response.json())
       .then((json) => {
         setReportedPosts(json);
@@ -14,14 +14,17 @@ const AsqmManageReports = () => {
       .catch((error) => console.error(error));
   }, []);
 
-  return (
-    reportedPosts && (
-      <ScrollView>
-        {reportedPosts.map((rp) => (
-          <TouchableOpacity
-            style={{backgroundColor: 'white'}}></TouchableOpacity>
-        ))}
-      </ScrollView>
-    )
+  return reportedPosts ? (
+    <ScrollView>
+      {reportedPosts.map((rp) => (
+        <TouchableOpacity style={{backgroundColor: 'white'}}>
+          <Text>{rp.report_date}</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  ) : (
+    <View></View>
   );
 };
+
+export default AsqmManageReports;

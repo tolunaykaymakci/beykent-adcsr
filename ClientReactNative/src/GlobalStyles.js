@@ -29,7 +29,7 @@ export const GlobalStyles = StyleSheet.create({
     marginBottom: 6,
     marginStart: 12,
     marginEnd: 12,
-    borderRadius: 9,
+    borderRadius: 4,
     overflow: 'hidden',
     padding: 12,
     shadowColor: '#000',

@@ -25,12 +25,13 @@ import {authorizedRequest} from '../../Service';
 import moment from 'moment';
 
 const ManStudyScreen = ({route, navigation}) => {
-  const {initDate, studies} = route.params;
+  const {initDate, studies, planId} = route.params;
 
   const [requestingPlans, setRequestingPlans] = useState(true);
   const [planText, setPlanText] = useState();
   const [lessonText, setLessonText] = useState();
   const [dateText, setDateText] = useState();
+  const [timeText, setTimeText] = useState();
   const [subjectText, setSubjectText] = useState();
   const [subjectsList, setSubjectsList] = useState([]);
   const [durationText, setDurationText] = useState([]);
@@ -51,13 +52,16 @@ const ManStudyScreen = ({route, navigation}) => {
   const timeSheet = useRef();
 
   useLayoutEffect(() => {
+    var paramDate = initDate ?? moment().format('yyyy-MM-DD');
+
     navigation.setOptions({
       headerTitle: studies ? 'Konu Çalışmamı Düzenle' : 'Konu Çalışması Ekle',
     });
 
     var initTime = moment().format('HH:mm:ss');
-    currentDate.current = moment(initDate + ' ' + initTime);
-    setDateText(currentDate.current.format('yyyy-MM-DD HH:mm:ss'));
+    currentDate.current = moment(paramDate + ' ' + initTime);
+    setDateText(currentDate.current.format('yyyy-MM-DD'));
+    setTimeText(currentDate.current.format('HH:mm:ss'));
 
     requestPlans();
   }, []);
@@ -67,7 +71,14 @@ const ManStudyScreen = ({route, navigation}) => {
       .then((response) => response.json())
       .then((json) => {
         plans.current = json.plans;
-        currentPlan.current = plans.current[0];
+
+        if (planId) {
+          currentPlan.current = plans.current[0];
+
+          json.plans.forEach((p) => {
+            if (p.plan_id === planId) currentPlan.current = p;
+          });
+        }
 
         let study = studies;
         if (study) {
@@ -120,7 +131,7 @@ const ManStudyScreen = ({route, navigation}) => {
   }
 
   const commitWithArrows = () => {
-    var editMode = studies !== null;
+    var editMode = studies;
 
     let p = currentPlan.current;
     let l = currentLesson.current;
@@ -162,6 +173,36 @@ const ManStudyScreen = ({route, navigation}) => {
       .finally(() => {});
   };
 
+  const deleteRecord = () => {
+    Alert.alert('Yanıtımı Sil', null, [
+      {
+        text: 'Vazgeç',
+        style: 'cancel',
+      },
+      {
+        text: 'Evet',
+        onPress: () => {
+          authorizedRequest('api/records/studies/delete', {
+            std_id: studies.study_id,
+          })
+            .then((response) => response.json())
+            .then((json) => {
+              if (Platform.OS == 'android') {
+                ToastAndroid.showWithGravity(
+                  'Konu çalışması silindi',
+                  ToastAndroid.SHORT,
+                  ToastAndroid.CENTER,
+                );
+              }
+
+              navigation.goBack(null);
+            })
+            .catch((error) => console.error(error));
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView
       style={{flex: 1, backgroundColor: GlobalColors.windowBackground}}>
@@ -169,8 +210,36 @@ const ManStudyScreen = ({route, navigation}) => {
         <View
           style={{backgroundColor: GlobalColors.headerSecondary, elevation: 4}}>
           <PlanSelectSheet plans={plans.current} refs={plansSheet} />
-          <DateTimeSelectSheet mode="date" refs={dateSheet} />
-          <DateTimeSelectSheet mode="time" refs={timeSheet} />
+          <DateTimeSelectSheet
+            mode="date"
+            refs={dateSheet}
+            initialDate={currentDate.current.toDate()}
+            callback={(date) => {
+              currentDate.current = moment(
+                date.format('yyyy-MM-DD') +
+                  ' ' +
+                  currentDate.current.format('HH:mm:ss'),
+              );
+
+              setDateText(currentDate.current.format('yyyy-MM-DD'));
+              dateSheet.current.close();
+            }}
+          />
+          <DateTimeSelectSheet
+            mode="time"
+            refs={timeSheet}
+            initialDate={currentDate.current.toDate()}
+            callback={(date) => {
+              currentDate.current = moment(
+                currentDate.current.format('yyyy-MM-DD') +
+                  ' ' +
+                  date.format('HH:mm:ss'),
+              );
+
+              setTimeText(currentDate.current.format('HH:mm:ss'));
+              timeSheet.current.close();
+            }}
+          />
           <LessonSelectSheet
             lessons={
               currentPlan.current == null ? null : currentPlan.current.lessons
@@ -241,7 +310,7 @@ const ManStudyScreen = ({route, navigation}) => {
             <TouchChoose
               action={() => timeSheet.current.open()}
               title="Saat"
-              value="20:12"
+              value={timeText}
             />
 
             <TouchChoose
@@ -269,25 +338,28 @@ const ManStudyScreen = ({route, navigation}) => {
       {navigation.setOptions({
         headerRight: () => (
           <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity
-              onPress={() => commitWithArrows()}
-              style={{
-                height: '100%',
-                justifyContent: 'center',
-                marginEnd: 3,
-              }}>
-              <MaterialIcons
+            {studies && (
+              <TouchableOpacity
+                onPress={() => deleteRecord()}
                 style={{
-                  alignSelf: 'center',
-                  marginBottom: 9,
-                  paddingEnd: 9,
-                  paddingStart: 9,
-                }}
-                name="delete"
-                color={GlobalColors.titleText}
-                size={26}
-              />
-            </TouchableOpacity>
+                  height: '100%',
+                  justifyContent: 'center',
+                  marginEnd: 3,
+                }}>
+                <MaterialIcons
+                  style={{
+                    alignSelf: 'center',
+                    marginBottom: 9,
+                    paddingEnd: 9,
+                    paddingStart: 9,
+                  }}
+                  name="delete"
+                  color={GlobalColors.titleText}
+                  size={26}
+                />
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
               onPress={() => commitWithArrows()}
               style={{

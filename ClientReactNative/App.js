@@ -29,6 +29,7 @@ import AsqmScreen from './screens/AsqmScreen';
 import AsqmQuestions from './screens/AsqmQuestionsScreen';
 import AsqmThreadScreen from './screens/AsqmThreadScreen';
 import AsqmAddScreen from './screens/AsqmAddScreen';
+import AsqmManageReports from './screens/AsqmManageReports';
 import CommScreen from './screens/CommScreen';
 
 import ReportsScreen from './screens/home/ReportsScreen';
@@ -90,14 +91,9 @@ function HomeStack() {
     <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{
-        headerStyle: {
-          backgroundColor: GlobalColors.headerBackground,
-          elevation: 0,
-          shadowOpacity: 0,
-          borderBottomWidth: 0,
-        },
-        headerTintColor: GlobalColors.titleText,
-        headerTitleStyle: {color: 'black'},
+        headerStyle: {backgroundColor: GlobalColors.headerBackground},
+        headerTintColor: 'black',
+        headerTitleStyle: {fontWeight: 'bold'},
       }}>
       <Stack.Screen
         name="Home"
@@ -204,6 +200,11 @@ function AsqmStack() {
         name="AsqmThread"
         component={AsqmThreadScreen}
         options={{title: 'Soru'}}
+      />
+      <Stack.Screen
+        name="AsqmManageReports"
+        component={AsqmManageReports}
+        options={{title: 'Rapor Edilen Gönderiler'}}
       />
       <Stack.Screen
         name="Profile"
@@ -412,11 +413,7 @@ const AppContainer = () => {
             tabBarVisible: showTabs(route),
             tabBarLabel: 'Home',
             tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons
-                name="library"
-                color={color}
-                size={size}
-              />
+              <MaterialCommunityIcons name="library" color={color} size={23} />
             ),
           })}
         />
@@ -431,7 +428,7 @@ const AppContainer = () => {
               <MaterialCommunityIcons
                 name="account-group"
                 color={color}
-                size={size}
+                size={23}
               />
             ),
           })}
@@ -444,7 +441,7 @@ const AppContainer = () => {
             tabBarVisible: showTabs(route),
             tabBarLabel: 'Soru Paylaş',
             tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons name="pencil" color={color} size={size} />
+              <MaterialCommunityIcons name="pencil" color={color} size={23} />
             ),
           })}
         />
@@ -455,11 +452,7 @@ const AppContainer = () => {
           options={{
             tabBarLabel: 'Profilim',
             tabBarIcon: ({color, size}) => (
-              <MaterialCommunityIcons
-                name="account"
-                color={color}
-                size={size}
-              />
+              <MaterialCommunityIcons name="account" color={color} size={23} />
             ),
           }}
         />

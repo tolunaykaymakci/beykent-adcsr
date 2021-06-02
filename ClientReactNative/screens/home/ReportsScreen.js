@@ -152,12 +152,33 @@ function App({route, navigation}) {
         console.error(error);
       });
 
+    var recordStartDate = repDateStr;
+    var recordEndDate;
+
+    var tempMoment = momentDate.current.clone();
+    var nowMoment = moment();
+    if (currentMode.current === 'daily') {
+      recordEndDate = repDateStr;
+    } else if (currentMode.current === 'weekly') {
+      tempMoment.add(1, 'w');
+    } else {
+      if (
+        tempMoment.month() === nowMoment.month() &&
+        tempMoment.year() === nowMoment.year()
+      ) {
+        tempMoment.set('D', nowMoment.date);
+      } else {
+        tempMoment.endOf('month');
+      }
+    }
+    recordEndDate = tempMoment.format('yyyy-MM-DD');
+
     /* Request records */
     authorizedRequest('api/records/' + type, {
       mode: 'range',
       plan: planId,
-      start: repDateStr,
-      end: repDateStr,
+      start: recordStartDate,
+      end: recordEndDate,
       user: user ? user.a_id : 0,
     })
       .then((response) => response.json())
@@ -950,12 +971,14 @@ function App({route, navigation}) {
                                 initDate: momentDate.current.format(
                                   'yyyy-MM-DD',
                                 ),
+                                planId: plan.plan_id,
                                 recordPack: record,
                               })
                             : navigation.navigate('ManStudy', {
                                 initDate: momentDate.current.format(
                                   'yyyy-MM-DD',
                                 ),
+                                planId: plan.plan_id,
                                 studies: record,
                               });
                         }}
@@ -973,9 +996,11 @@ function App({route, navigation}) {
               type === 'questions'
                 ? navigation.navigate('ManQuestions', {
                     initDate: momentDate.current.format('yyyy-MM-DD'),
+                    planId: plan.plan_id,
                   })
                 : navigation.navigate('ManStudy', {
                     initDate: momentDate.current.format('yyyy-MM-DD'),
+                    planId: plan.plan_id,
                   })
             }
             style={{
