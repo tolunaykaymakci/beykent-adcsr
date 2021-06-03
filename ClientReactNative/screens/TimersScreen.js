@@ -14,6 +14,7 @@ import {
 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {authorizedRequest} from '../Service';
+import moment from 'moment';
 
 function App({route, navigation}) {
   const [timers, setTimers] = useState();
@@ -57,11 +58,12 @@ function App({route, navigation}) {
     const [timerText, setTimerText] = useState('');
 
     useEffect(() => {
-      setTimeout(
+      progressTimer();
+      setInterval(
         function () {
           progressTimer();
         }.bind(this),
-        1000,
+        100,
       );
     }, []);
 
@@ -83,9 +85,14 @@ function App({route, navigation}) {
     function progressTimer() {
       var timer = sdbtimer;
 
-      let date1 = new Date();
-      let date2 = new Date(timer.date_target);
-      var millis = Math.abs(date1 - date2);
+      //let date1 = new Date();
+      //let date2 = new Date(Number(timer.date));
+      //var millis = Math.abs(date1 - date2);
+
+      globalThis.infront = timer;
+
+      let millis =
+        new Date().getTime() - moment(timer.target_date).toDate().getTime();
 
       if ((timer.future && millis >= 0) || (!timer.future && millis <= 0)) {
         timer.done = true;
@@ -103,6 +110,11 @@ function App({route, navigation}) {
       let elapsedMinutes = millis / minutesInMilli;
       millis = millis % minutesInMilli;
       let elapsedSeconds = millis / secondsInMilli;
+
+      elapsedDays = Math.floor(elapsedDays);
+      elapsedHours = Math.floor(elapsedHours);
+      elapsedMinutes = Math.floor(elapsedMinutes);
+      elapsedSeconds = Math.floor(elapsedSeconds);
 
       var made = '';
       if (elapsedDays == 0) {
@@ -205,7 +217,7 @@ function App({route, navigation}) {
           <View style={{alignSelf: 'center'}}>
             <Text style={{color: 'white'}}>Kalan Süre</Text>
             <Text style={{color: 'white', fontWeight: 'bold', marginTop: 4}}>
-              42 gün 2 saat 3 dakika 2 saniye
+              {timerText}
             </Text>
           </View>
         </View>

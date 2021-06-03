@@ -363,8 +363,8 @@ const ProfileScreen = ({route, navigation}) => {
                       }}>
                       {plan.name}
                     </Text>
-                    <Button
-                      title="Soru Çözümleri ->"
+
+                    <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('Reports', {
                           planId: plan.plan_id,
@@ -373,9 +373,22 @@ const ProfileScreen = ({route, navigation}) => {
                           userref: userInfoRef.current,
                         })
                       }
-                    />
-                    <Button
-                      title="Konu Tekrarları ->"
+                      style={{
+                        flex: 1,
+                        marginTop: 18,
+                        backgroundColor: GlobalColors.accentColor,
+                        paddingTop: 6,
+                        paddingBottom: 6,
+                        paddingStart: 12,
+                        borderRadius: 20,
+                        paddingEnd: 12,
+                      }}>
+                      <Text style={{color: 'white', fontSize: 16}}>
+                        Soru Çözümleri
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('Reports', {
                           planId: plan.plan_id,
@@ -384,7 +397,21 @@ const ProfileScreen = ({route, navigation}) => {
                           userref: userInfoRef.current,
                         })
                       }
-                    />
+                      style={{
+                        flex: 1,
+                        marginTop: 18,
+                        backgroundColor: GlobalColors.accentColor,
+                        paddingTop: 6,
+                        paddingBottom: 6,
+                        paddingStart: 12,
+                        borderRadius: 20,
+                        paddingEnd: 12,
+                        marginBottom: 12,
+                      }}>
+                      <Text style={{color: 'white', fontSize: 16}}>
+                        Konu Çalışmaları
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 ))}
               </View>

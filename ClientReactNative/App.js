@@ -91,7 +91,10 @@ function HomeStack() {
     <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{
-        headerStyle: {backgroundColor: GlobalColors.headerBackground},
+        headerStyle: {
+          backgroundColor: GlobalColors.headerBackground,
+          elevation: 0,
+        },
         headerTintColor: 'black',
         headerTitleStyle: {fontWeight: 'bold'},
       }}>
@@ -253,7 +256,10 @@ function SettingsStack() {
     <Stack.Navigator
       initialRouteName="Settings"
       screenOptions={{
-        headerStyle: {backgroundColor: GlobalColors.headerBackground},
+        headerStyle: {
+          backgroundColor: GlobalColors.headerBackground,
+          elevation: 0,
+        },
         headerTintColor: 'black',
         headerTitleStyle: {fontWeight: 'bold'},
       }}>
@@ -377,10 +383,10 @@ const SplashContainer = () => {
       <StatusBar backgroundColor={'#fff'} barStyle={'dark-content'} />
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Image
-          source={require('./assets/notebook.png')}
+          source={require('./assets/adcsr-logo.png')}
           style={{
-            width: 82,
-            height: 82,
+            width: 96,
+            height: 96,
           }}
           resizeMode="contain"
         />

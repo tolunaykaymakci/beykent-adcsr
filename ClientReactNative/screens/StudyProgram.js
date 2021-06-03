@@ -108,6 +108,7 @@ const StudyProgram = ({route, navigation}) => {
   useEffect(() => {
     if (mode === 'create') {
       programSheet.current.open();
+      setFspVisible(false);
     } else {
       /** Request program data */
       let apiep = 'ss/sdb/plans/program/' + plan.program_type;

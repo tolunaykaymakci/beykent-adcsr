@@ -260,7 +260,7 @@ function App({route, navigation}) {
                                 width: 36,
                                 height: 36,
                               }}
-                              resizeMode="contain"
+                              resizeMode="cover"
                             />
                           </TouchableOpacity>
 

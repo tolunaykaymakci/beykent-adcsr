@@ -49,25 +49,21 @@ const AsqmGridItem = ({post, navigation}) => {
           </Text>
         </View>
 
-        {/* Top Panel 
-        <View
-          style={{
-            width: '100%',
-            padding: 6,
-            backgroundColor: 'rgba(255, 255, 255, .85)',
-            position: 'absolute',
-            top: 0,
-            flexDirection: 'row',
-          }}>
-          <Image
+        {post.solved && (
+          <View
             style={{
-              height: 16,
-              width: 16,
-            }}
-            source={{uri: post.poster_pic}}
-          />
-          <Text>@{post.poster}</Text>
-        </View>*/}
+              backgroundColor: 'black',
+              position: 'absolute',
+              backgroundColor: 'rgb(102,177,97)',
+              top: 6,
+              borderRadius: 30,
+              padding: 6,
+              elevation: 2,
+              right: 6,
+            }}>
+            <Text style={{color: 'white', fontSize: 14}}>ÇÖZÜLDÜ</Text>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );

@@ -32,13 +32,6 @@ const RecordItem = ({title, nav, subj, desc, time, action}) => (
       height: 64,
       flexDirection: 'row',
     }}>
-    <MaterialCommunityIcons
-      style={{alignSelf: 'center', marginEnd: 8}}
-      name="border-color"
-      color={'rgb(171,180,190)'}
-      size={24}
-    />
-
     <View style={{alignSelf: 'center'}}>
       <Text style={{fontWeight: 'bold', fontSize: 14}}>{title}</Text>
       <Text style={{fontSize: 13}}>{subj}</Text>
@@ -53,11 +46,13 @@ const RecordItem = ({title, nav, subj, desc, time, action}) => (
         alignSelf: 'center',
       }}>
       <MaterialCommunityIcons
-        name="border-color"
+        name="timer"
         color={'rgb(171,180,190)'}
-        size={21}
+        size={18}
       />
-      <Text style={{fontSize: 17}}>{time.substring(11, 16)}</Text>
+      <Text style={{marginStart: 2, fontSize: 17}}>
+        {time.substring(11, 16)}
+      </Text>
     </View>
   </TouchableOpacity>
 );
@@ -92,7 +87,7 @@ function App({route, navigation}) {
     currentMode.current = 'daily';
     navigation.setOptions({
       headerTitle:
-        type === 'questions' ? 'Soru Çözümlerim' : 'Konu Tekrarlarım',
+        type === 'questions' ? 'Soru Çözümlerim' : 'Konu Çalışmalarım',
     });
 
     authorizedRequest('ss/sdb/plan', {plan_id: planId})
@@ -502,7 +497,7 @@ function App({route, navigation}) {
                   momentDate.current = moment(data);
                   requestReport();
                 }}
-                source={{uri: 'http://192.168.1.104:5000/grpfr'}}
+                source={{uri: makeApiep('grpfr')}}
                 scalesPageToFit={true}
                 bounces={false}
                 showsHorizontalScrollIndicator={false}
@@ -996,11 +991,11 @@ function App({route, navigation}) {
               type === 'questions'
                 ? navigation.navigate('ManQuestions', {
                     initDate: momentDate.current.format('yyyy-MM-DD'),
-                    planId: plan.plan_id,
+                    planId: plan.current.plan_id,
                   })
                 : navigation.navigate('ManStudy', {
                     initDate: momentDate.current.format('yyyy-MM-DD'),
-                    planId: plan.plan_id,
+                    planId: plan.current.plan_id,
                   })
             }
             style={{

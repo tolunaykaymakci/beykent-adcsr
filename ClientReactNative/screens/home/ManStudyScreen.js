@@ -4,6 +4,7 @@ import {
   SafeAreaView,
   Text,
   View,
+  Alert,
   ToastAndroid,
   ScrollView,
   TouchableOpacity,
@@ -174,7 +175,7 @@ const ManStudyScreen = ({route, navigation}) => {
   };
 
   const deleteRecord = () => {
-    Alert.alert('Yanıtımı Sil', null, [
+    Alert.alert('Bu Kaydı Sil?', null, [
       {
         text: 'Vazgeç',
         style: 'cancel',
@@ -185,8 +186,7 @@ const ManStudyScreen = ({route, navigation}) => {
           authorizedRequest('api/records/studies/delete', {
             std_id: studies.study_id,
           })
-            .then((response) => response.json())
-            .then((json) => {
+            .then((response) => {
               if (Platform.OS == 'android') {
                 ToastAndroid.showWithGravity(
                   'Konu çalışması silindi',

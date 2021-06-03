@@ -101,7 +101,7 @@ const AsqmScreen = ({navigation}) => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text>Yükleniyor... bir sn lütfen</Text>
+            <Text>Yükleniyor...</Text>
           </View>
         ) : (
           <ScrollView

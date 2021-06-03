@@ -1,7 +1,9 @@
 import React from 'react';
 
-const SERVICE_URL = 'http://192.168.1.104:5000/';
-// const SERVICE_URL = 'https://sorusayaci.com/';
+import {ServiceWorkerL, ServiceWorkerR} from './src/components/ssjs-widget';
+
+// const SERVICE_URL = ServiceWorkerL();
+const SERVICE_URL = ServiceWorkerR();
 const GTOKEN = '{adcsr}';
 export const AuthorizedRequestContract = {
   gt: GTOKEN,
@@ -67,13 +69,13 @@ export const makeApiep = (ep) => {
 
 export const updateUserInfo = (callback) => {
   authorizedRequest('api/account/info', {info_self: true})
-  .then((response) => response.json())
-  .then((json) => {
-    if (json.status && json.status == 401) {
-      return;
-    }
+    .then((response) => response.json())
+    .then((json) => {
+      if (json.status && json.status == 401) {
+        return;
+      }
 
-    global.user = json;
-    callback();
-  });
+      global.user = json;
+      callback();
+    });
 };

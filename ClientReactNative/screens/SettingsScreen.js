@@ -633,6 +633,7 @@ const SettingsScreen = ({route, navigation}) => {
         refs={accessSheet}
         selected={(val) => {
           accessSheet.current.close();
+          setSetting('StudySummaryReportAccesibleBy', val, 'string');
           setSetting('StudyDetailedReportAccesibleBy', val, 'string');
         }}
       />

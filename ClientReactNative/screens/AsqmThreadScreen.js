@@ -325,14 +325,14 @@ const AsqmContainer = ({post, type, navigation, threadId, reload}) => {
   };
 
   const reportThisPost = (pid, check) => {
-    authorizedRequest('ss/asqm/post/reply', {post_id: pid, check})
+    authorizedRequest('ss/asqm/post/report', {post_id: pid, check})
       .then((response) => response.json())
       .then((json) => {
         if (check) {
           if (json.report_exists) {
             alert('Bu gönderi ile ilgili raporunuzu aldık.');
           } else {
-            reportThisPost(pid, true);
+            reportThisPost(pid, false);
           }
         } else {
           alert(
@@ -340,7 +340,7 @@ const AsqmContainer = ({post, type, navigation, threadId, reload}) => {
           );
         }
       })
-      .catch((error) => console.error(error));
+      .catch((error) => alert('Bir sorun oluştu'));
   };
 
   const sendMyReply = (post_id) => {
@@ -350,7 +350,7 @@ const AsqmContainer = ({post, type, navigation, threadId, reload}) => {
         // This may not work, we gonna have to test it goood!
         post.replies.push(json.new_reply);
         setKey(new Date());
-
+        setReplyVisible(false);
         // we may rerequest all thread :( sad stuff
       })
       .catch((error) => console.error(error));
@@ -449,24 +449,26 @@ const AsqmContainer = ({post, type, navigation, threadId, reload}) => {
             </View>
           </TouchableOpacity>
 
-          {!post.solved && type !== 'question' && (
-            <TouchableOpacity
-              onPress={() => markAnswer()}
-              style={{
-                alignSelf: 'flex-end',
-                padding: 8,
-                paddingStart: 10,
-                paddingEnd: 10,
-                borderRadius: 16,
-                position: 'absolute',
-                right: 52,
-                alignSelf: 'center',
-                top: 9,
-                backgroundColor: GlobalColors.accentColor,
-              }}>
-              <Text style={{color: 'white', fontSize: 13}}>ÇÖZÜMÜ SEÇ</Text>
-            </TouchableOpacity>
-          )}
+          {!post.solved &&
+            type !== 'question' &&
+            post.poster === global.user.username && (
+              <TouchableOpacity
+                onPress={() => markAnswer()}
+                style={{
+                  alignSelf: 'flex-end',
+                  padding: 8,
+                  paddingStart: 10,
+                  paddingEnd: 10,
+                  borderRadius: 16,
+                  position: 'absolute',
+                  right: 52,
+                  alignSelf: 'center',
+                  top: 9,
+                  backgroundColor: GlobalColors.accentColor,
+                }}>
+                <Text style={{color: 'white', fontSize: 13}}>ÇÖZÜMÜ SEÇ</Text>
+              </TouchableOpacity>
+            )}
 
           <TouchableOpacity
             onPress={() => {

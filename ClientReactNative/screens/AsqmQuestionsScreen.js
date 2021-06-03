@@ -18,9 +18,11 @@ const AsqmQuestionsScreen = ({route, navigation}) => {
   const [hasScrolled, setHasScrolled] = useState(false);
 
   useEffect(() => {
-    getRequest( 'ss/asqm/posts?&type=0&count=50&lid=' + lessonId,)
+    getRequest('ss/asqm/posts?adcsr=true&type=0&count=50&lid=' + lessonId)
       .then((response) => response.json())
-      .then((json) => {console.log(json);setData(json.items);})
+      .then((json) => {
+        setData(json.items);
+      })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
   }, []);
@@ -28,7 +30,12 @@ const AsqmQuestionsScreen = ({route, navigation}) => {
   const loadMore = () => {
     if (!hasScrolled) return;
 
-    getRequest('ss/asqm/posts?&type=0&count=50&lid=' + lessonId + '&lastid=' + data[data.length - 1].id,)
+    getRequest(
+      'ss/asqm/posts?adcsr=true&type=0&count=50&lid=' +
+        lessonId +
+        '&lastid=' +
+        data[data.length - 1].id,
+    )
       .then((response) => response.json())
       .then((json) => setData([...data, ...json.items]))
       .catch((error) => console.error(error))
@@ -46,7 +53,7 @@ const AsqmQuestionsScreen = ({route, navigation}) => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Text>Yükleniyor... bir sn lütfen</Text>
+            <Text>Yükleniyor...</Text>
           </View>
         ) : (
           <FlatList
