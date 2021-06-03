@@ -53,7 +53,7 @@ const PostAnswerSheet = ({refs, answerPost, threadPost, reload}) => {
     postra.setLessonId(threadPost.lid);
     postra.setSubjectId(threadPost.sid);
     postra.setReplyToId(answerPost.id);
-    postra.setPostBody(text);
+    postra.setPostBody(body);
     if (image2) {
       postra.setPostImages(image0, image1, image2);
     } else if (image1) {
@@ -266,7 +266,14 @@ const PostAnswerSheet = ({refs, answerPost, threadPost, reload}) => {
   );
 };
 
-const AsqmContainer = ({post, type, navigation, threadId, reload}) => {
+const AsqmContainer = ({
+  post,
+  type,
+  navigation,
+  threadId,
+  reload,
+  threadPost,
+}) => {
   const [key, setKey] = useState(new Date());
 
   const [body, setBody] = useState('');
@@ -357,15 +364,33 @@ const AsqmContainer = ({post, type, navigation, threadId, reload}) => {
   };
 
   const markAnswer = () => {
-    authorizedRequest('ss/asqm/post/accept', {
-      thread_id: threadId,
-      answer_id: post.id,
-    })
-      .then((response) => response.json())
-      .then((json) => {
-        reload();
-      })
-      .catch((error) => console.error(error));
+    Alert.alert('Çözümü Kabul Et?', null, [
+      {
+        text: 'Vazgeç',
+        style: 'cancel',
+      },
+      {
+        text: 'Evet',
+        onPress: () => {
+          authorizedRequest('ss/asqm/post/delete', {
+            post_id: pid,
+          })
+            .then((response) => response.json())
+            .then((json) => {
+              authorizedRequest('ss/asqm/post/accept', {
+                thread_id: threadId,
+                answer_id: post.id,
+              })
+                .then((response) => response.json())
+                .then((json) => {
+                  reload();
+                })
+                .catch((error) => console.error(error));
+            })
+            .catch((error) => console.error(error));
+        },
+      },
+    ]);
   };
 
   return (
@@ -451,7 +476,7 @@ const AsqmContainer = ({post, type, navigation, threadId, reload}) => {
 
           {!post.solved &&
             type !== 'question' &&
-            post.poster === global.user.username && (
+            threadPost.poster === global.user.username && (
               <TouchableOpacity
                 onPress={() => markAnswer()}
                 style={{
@@ -672,6 +697,10 @@ const AsqmThreadScreen = ({route, navigation}) => {
   const answerSheet = useRef();
 
   useEffect(() => {
+    requestThread();
+  }, []);
+
+  const requestThread = () => {
     getRequest('ss/asqm/thread?pid=' + threadId)
       .then((response) => response.json())
       .then((json) => {
@@ -679,7 +708,7 @@ const AsqmThreadScreen = ({route, navigation}) => {
       })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
-  }, []);
+  };
 
   const reply = () => {};
 
@@ -687,8 +716,9 @@ const AsqmThreadScreen = ({route, navigation}) => {
     <SafeAreaView style={{flex: 1}}>
       <PostAnswerSheet
         refs={answerSheet}
-        replyPost={answerPost}
+        answerPost={answerPost}
         threadPost={thread}
+        reload={() => requestThread()}
       />
 
       <View>
@@ -717,6 +747,8 @@ const AsqmThreadScreen = ({route, navigation}) => {
             <AsqmContainer
               post={thread}
               type="question"
+              threadPost={thread}
+              reload={() => requestThread()}
               navigation={navigation}
             />
 
@@ -737,6 +769,8 @@ const AsqmThreadScreen = ({route, navigation}) => {
                   <AsqmContainer
                     post={post}
                     type="answer"
+                    threadPost={thread}
+                    reload={() => requestThread()}
                     threadOd={thread.id}
                   />
                 ))}

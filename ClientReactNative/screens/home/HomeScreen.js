@@ -73,9 +73,11 @@ const HomeSummaryScreen = ({nav}) => {
         setQReportData(json);
         setLoadingQReports(false);
 
-        let jsFunc = makeQGraphRequestJs(repDateStr, planId);
-        quesGraph.current.injectJavaScript('disableHighlights()');
-        quesGraph.current.injectJavaScript(jsFunc);
+        setTimeout(function () {
+          let jsFunc = makeQGraphRequestJs(repDateStr, planId);
+          quesGraph.current.injectJavaScript('disableHighlights()');
+          quesGraph.current.injectJavaScript(jsFunc);
+        }, 1000);
       })
       .catch((error) => console.error(error));
 
@@ -85,9 +87,11 @@ const HomeSummaryScreen = ({nav}) => {
         setSReportData(json);
         setLoadingSReports(false);
 
-        let jsFunc = makeSGraphRequestJs(repDateStr, planId);
-        studGraph.current.injectJavaScript('disableHighlights()');
-        studGraph.current.injectJavaScript(jsFunc);
+        setTimeout(function () {
+          let jsFunc = makeSGraphRequestJs(repDateStr, planId);
+          studGraph.current.injectJavaScript('disableHighlights()');
+          studGraph.current.injectJavaScript(jsFunc);
+        }, 1000);
       })
       .catch((error) => console.error(error));
   };

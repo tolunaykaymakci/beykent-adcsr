@@ -21,7 +21,7 @@ import ReportLesson from '../../src/components/ReportLesson';
 
 import RDS from './RecordDetailsScreen';
 
-import {authorizedRequest, dump, getAuthToken} from '../../Service';
+import {authorizedRequest, dump, getAuthToken, makeApiep} from '../../Service';
 import {useIsFocused} from '@react-navigation/native';
 
 const RecordItem = ({title, nav, subj, desc, time, action}) => (
@@ -81,6 +81,8 @@ function App({route, navigation}) {
 
   const graphUserId = useRef();
 
+  const graphFirstCall = useRef(true);
+
   useEffect(() => {
     graphUserId.current = userref ? userref.a_id : global.user.a_id;
 
@@ -119,9 +121,21 @@ function App({route, navigation}) {
     let user = userref;
 
     setShowFab(false);
-    var repDateStr = momentDate.current.format('yyyy-MM-DD');
-    graphWebView.current.injectJavaScript("enableHighlights('" + type + "')");
-    graphWebView.current.injectJavaScript(makeGraphRequestJs(repDateStr));
+
+    if (graphFirstCall.current === true) {
+      graphFirstCall.current = false;
+      setTimeout(function () {
+        var repDateStr = momentDate.current.format('yyyy-MM-DD');
+        graphWebView.current.injectJavaScript(
+          "enableHighlights('" + type + "')",
+        );
+        graphWebView.current.injectJavaScript(makeGraphRequestJs(repDateStr));
+      }, 1000);
+    } else {
+      var repDateStr = momentDate.current.format('yyyy-MM-DD');
+      graphWebView.current.injectJavaScript("enableHighlights('" + type + "')");
+      graphWebView.current.injectJavaScript(makeGraphRequestJs(repDateStr));
+    }
 
     updateGraphControls();
 

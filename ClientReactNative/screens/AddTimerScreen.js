@@ -15,7 +15,7 @@ import {
 
 import {GlobalStyles, GlobalColors} from '../src/GlobalStyles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {authorizedRequest} from '../Service';
+import {authorizedRequest, getRequest} from '../Service';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 import DatePicker from 'react-native-date-picker';
@@ -78,7 +78,7 @@ function App({route, navigation}) {
   const dateSheet = useRef();
 
   useEffect(() => {
-    fetch('http://192.168.1.104:5000/ss/sdb/get-known-timers')
+    getRequest('ss/sdb/get-known-timers')
       .then((response) => response.json())
       .then((json) => {
         setKnownTimers(json.known_timers);

@@ -183,24 +183,25 @@ const AsqmScreen = ({navigation}) => {
         </View>
       )}
 
-      {navigation.setOptions({
-        headerRight: () => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('AsqmManageReports')}
-            style={{
-              backgroundColor: GlobalColors.accentColor,
-              borderTopLeftRadius: 6,
-              borderBottomLeftRadius: 6,
-              borderTopRightRadius: 21,
-              borderBottomRightRadius: 21,
-              padding: 8,
-              marginRight: 8,
-              alignItems: 'center',
-            }}>
-            <Text style={{color: 'white'}}>Yönet</Text>
-          </TouchableOpacity>
-        ),
-      })}
+      {global.user.username === 'admin' &&
+        navigation.setOptions({
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('AsqmManageReports')}
+              style={{
+                backgroundColor: GlobalColors.accentColor,
+                borderTopLeftRadius: 6,
+                borderBottomLeftRadius: 6,
+                borderTopRightRadius: 21,
+                borderBottomRightRadius: 21,
+                padding: 8,
+                marginRight: 8,
+                alignItems: 'center',
+              }}>
+              <Text style={{color: 'white'}}>Yönet</Text>
+            </TouchableOpacity>
+          ),
+        })}
     </SafeAreaView>
   );
 };

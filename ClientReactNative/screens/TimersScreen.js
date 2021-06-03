@@ -111,10 +111,10 @@ function App({route, navigation}) {
       millis = millis % minutesInMilli;
       let elapsedSeconds = millis / secondsInMilli;
 
-      elapsedDays = Math.floor(elapsedDays);
-      elapsedHours = Math.floor(elapsedHours);
-      elapsedMinutes = Math.floor(elapsedMinutes);
-      elapsedSeconds = Math.floor(elapsedSeconds);
+      elapsedDays = Math.abs(Math.floor(elapsedDays));
+      elapsedHours = Math.abs(Math.floor(elapsedHours));
+      elapsedMinutes = Math.abs(Math.floor(elapsedMinutes));
+      elapsedSeconds = Math.abs(Math.floor(elapsedSeconds));
 
       var made = '';
       if (elapsedDays == 0) {

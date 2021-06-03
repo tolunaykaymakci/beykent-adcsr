@@ -7,7 +7,7 @@ const TransmissionSteps = {
   Completed: 2,
 };
 
-const DATA_PACKET_SIZE = 8192;
+const DATA_PACKET_SIZE = 16384;
 
 let DataTransmission = function () {
   this.dataBytes = [];
